@@ -2034,6 +2034,7 @@
   </script>
   <div id="productos"></div>
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 
 import {
@@ -2042,8 +2043,9 @@ import {
   get
 } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
+  apiKey: "TU_APIKEY",
   authDomain: "oleaje-store.firebaseapp.com",
   projectId: "oleaje-store",
   storageBucket: "oleaje-store.firebasestorage.app",
@@ -2061,31 +2063,34 @@ async function cargarProductos() {
 
   if (snapshot.exists()) {
 
-    const productos = snapshot.val();
-
     let html = "";
 
-    for (let key in productos) {
+    snapshot.forEach((childSnapshot) => {
 
-      const producto = productos[key];
+      const producto = childSnapshot.val();
 
       html += `
-        <div class="product-card">
+        <div>
           <img src="${producto.imagen}" width="200">
           <h3>${producto.nombre}</h3>
           <p>$${producto.precio}</p>
         </div>
       `;
-    }
+
+    });
 
     document.getElementById("productos").innerHTML = html;
 
   } else {
+
     console.log("No hay productos");
+
   }
+
 }
 
 cargarProductos();
+
 </script>
 </body>
 </html>

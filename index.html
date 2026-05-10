@@ -2058,7 +2058,13 @@ async function cargarProductos() {
   const snapshot = await get(ref(db, "productos"));
 
   if (snapshot.exists()) {
-    console.log(snapshot.val());
+
+    const productos = snapshot.val();
+
+    for (let key in productos) {
+      console.log(productos[key]);
+    }
+
   } else {
     console.log("No hay productos");
   }

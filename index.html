@@ -2032,6 +2032,7 @@
   renderProducts(products);
   updateCartCount();
   </script>
+  <div id="productos"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 
@@ -2055,15 +2056,29 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 async function cargarProductos() {
+
   const snapshot = await get(ref(db, "productos"));
 
   if (snapshot.exists()) {
 
     const productos = snapshot.val();
 
+    let html = "";
+
     for (let key in productos) {
-      console.log(productos[key]);
+
+      const producto = productos[key];
+
+      html += `
+        <div class="product-card">
+          <img src="${producto.imagen}" width="200">
+          <h3>${producto.nombre}</h3>
+          <p>$${producto.precio}</p>
+        </div>
+      `;
     }
+
+    document.getElementById("productos").innerHTML = html;
 
   } else {
     console.log("No hay productos");

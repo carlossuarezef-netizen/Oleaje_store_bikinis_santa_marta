@@ -2033,7 +2033,7 @@
   updateCartCount();
   </script>
 
-<section id="productos"></section>
+
 
 <script type="module">
 
@@ -2096,5 +2096,17 @@ document.getElementById("productos").innerHTML = html;
 cargarProductos();
 
 </script>
+<section id="productos"></section>
+<style>
+#productos{
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  padding:40px;
+  background:white;
+  position:relative;
+  z-index:9999;
+}
+</style>
 </body>
 </html>

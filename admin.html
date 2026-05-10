@@ -852,5 +852,69 @@ if (user !== usuario || pass !== password) {
   document.getElementById('sidebar').style.display = 'none';
   document.getElementById('mainAdmin').style.display = 'none';
   </script>
+<h2>Agregar Producto</h2>
+
+<input type="text" id="nombre" placeholder="Nombre">
+
+<input type="number" id="precio" placeholder="Precio">
+
+<input type="text" id="imagen" placeholder="URL imagen">
+
+<button onclick="guardarProducto()">
+  Guardar
+</button>
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  push
+}
+from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
+  authDomain: "oleaje-store.firebaseapp.com",
+  projectId: "oleaje-store",
+  storageBucket: "oleaje-store.firebasestorage.app",
+  messagingSenderId: "253321516324",
+  appId: "1:253321516324:web:92696cce481b5189e8fb1"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+
+window.guardarProducto = function () {
+
+  const nombre =
+    document.getElementById("nombre").value;
+
+  const precio =
+    document.getElementById("precio").value;
+
+  const imagen =
+    document.getElementById("imagen").value;
+
+
+  push(ref(db, "productos"), {
+
+    nombre,
+    precio,
+    imagen
+
+  });
+
+  alert("Producto guardado");
+
+}
+
+</script>
 </body>
 </html>

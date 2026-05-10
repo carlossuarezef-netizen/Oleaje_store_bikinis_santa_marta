@@ -2032,29 +2032,27 @@
   renderProducts(products);
   updateCartCount();
   </script>
-  <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+<script type="module">
 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
-    authDomain: "oleaje-store.firebaseapp.com",
-    projectId: "oleaje-store",
-    storageBucket: "oleaje-store.firebasestorage.app",
-    messagingSenderId: "253321516324",
-    appId: "1:253321516324:web:92696cce4818b5189e8fb1"
-  };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  import { 
+import {
   getFirestore,
   collection,
   getDocs
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "oleaje-store.firebaseapp.com",
+  projectId: "oleaje-store",
+  storageBucket: "oleaje-store.firebasestorage.app",
+  messagingSenderId: "253321516324",
+  appId: "1:253321516324:web:92696cce481b5189e8fb1"
+};
+
+const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
@@ -2069,6 +2067,43 @@ async function cargarProductos() {
 }
 
 cargarProductos();
+
+</script> <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
+  authDomain: "oleaje-store.firebaseapp.com",
+  projectId: "oleaje-store",
+  storageBucket: "oleaje-store.firebasestorage.app",
+  messagingSenderId: "253321516324",
+  appId: "1:253321516324:web:92696cce481b5189e8fb1"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+async function cargarProductos() {
+
+  const querySnapshot = await getDocs(collection(db, "productos"));
+
+  querySnapshot.forEach((doc) => {
+    console.log(doc.id, "=>", doc.data());
+  });
+
+}
+
+cargarProductos();
+
 </script>
 </body>
 </html>

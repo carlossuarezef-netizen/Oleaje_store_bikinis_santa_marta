@@ -2074,7 +2074,7 @@ async function cargarProductos() {
 Object.values(snapshot.val()).forEach((producto) => {
 
   html += `
-    <div>
+    <div style="padding:20px; border:1px solid #ccc; margin:10px;">
       <img src="${producto.imagen}" width="200">
       <h3>${producto.nombre}</h3>
       <p>$${producto.precio}</p>
@@ -2083,7 +2083,7 @@ Object.values(snapshot.val()).forEach((producto) => {
 
 });
 
-document.getElementById("productos").innerHTML = html
+document.getElementById("productos").innerHTML = html;
 
   } else {
 

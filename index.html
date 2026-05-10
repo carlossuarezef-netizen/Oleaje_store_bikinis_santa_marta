@@ -2069,21 +2069,19 @@ async function cargarProductos() {
 
     let html = "";
 
-    snapshot.forEach((childSnapshot) => {
+Object.values(snapshot.val()).forEach((producto) => {
 
-      const producto = childSnapshot.val();
+  html += `
+    <div>
+      <img src="${producto.imagen}" width="200">
+      <h3>${producto.nombre}</h3>
+      <p>$${producto.precio}</p>
+    </div>
+  `;
 
-      html += `
-        <div>
-          <img src="${producto.imagen}" width="200">
-          <h3>${producto.nombre}</h3>
-          <p>$${producto.precio}</p>
-        </div>
-      `;
+});
 
-    });
-
-    document.getElementById("productos").innerHTML = html;
+document.getElementById("productos").innerHTML = html
 
   } else {
 

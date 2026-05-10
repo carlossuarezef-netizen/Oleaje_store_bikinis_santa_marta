@@ -2036,10 +2036,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+  getDatabase,
+  ref,
+  get
+} from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
@@ -2052,21 +2052,19 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 async function cargarProductos() {
+  const snapshot = await get(ref(db, "productos"));
 
-  const querySnapshot = await getDocs(collection(db, "productos"));
-
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
-  });
-
-  console.log("Firebase conectado correctamente");
+  if (snapshot.exists()) {
+    console.log(snapshot.val());
+  } else {
+    console.log("No hay productos");
+  }
 }
 
 cargarProductos();
-
 </script>
 </body>
 </html>

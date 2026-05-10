@@ -2064,7 +2064,7 @@ async function cargarProductos() {
   console.log("FUNCION INICIADA");
 
   const snapshot = await get(ref(db, "productos"));
- console.log(snapshot.vale());
+ console.log(snapshot.val());
   if (snapshot.exists()) {
 
     let html = "";

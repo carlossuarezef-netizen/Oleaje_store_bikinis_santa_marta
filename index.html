@@ -2034,42 +2034,6 @@
   </script>
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
-
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "oleaje-store.firebaseapp.com",
-  projectId: "oleaje-store",
-  storageBucket: "oleaje-store.firebasestorage.app",
-  messagingSenderId: "253321516324",
-  appId: "1:253321516324:web:92696cce481b5189e8fb1"
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-async function cargarProductos() {
-
-  const querySnapshot = await getDocs(collection(db, "productos"));
-
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
-  });
-
-}
-
-cargarProductos();
-
-</script> <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
 import {

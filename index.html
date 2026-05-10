@@ -2060,9 +2060,10 @@ const db = getDatabase(app);
 console.log(db);
 
 async function cargarProductos() {
+  console.log("FUNCION INICIADA");
 
   const snapshot = await get(ref(db, "productos"));
-
+ console.log(snapshot.vale());
   if (snapshot.exists()) {
 
     let html = "";

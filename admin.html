@@ -860,10 +860,10 @@ if (user !== usuario || pass !== password) {
 
 <input type="text" id="imagen" placeholder="URL imagen">
 
-<button onclick="guardarProducto()">
+<button id="guardarBtn">
   Guardar Producto
 </button>
-<script>
+<script type="module">
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
@@ -915,6 +915,8 @@ window.guardarProducto = function () {
   alert("Producto guardado");
 
 }
+document.getElementById("guardarBtn")
+.addEventListener("click", guardarProducto);
 
 </script>
 </body>

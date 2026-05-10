@@ -2063,27 +2063,30 @@ const db = getDatabase(app);
 console.log(db);
 
 async function cargarProductos() {
+
   console.log("FUNCION INICIADA");
 
   const snapshot = await get(ref(db, "productos"));
- console.log(snapshot.val());  
- if (snapshot.exists()) {
+
+  console.log(snapshot.val());
+
+  if(snapshot.exists()) {
 
     let html = "";
 
-Object.values(snapshot.val()).forEach((producto) => {
+    Object.values(snapshot.val()).forEach((producto) => {
 
-  html += `
-    <div style="padding:20px; border:1px solid #ccc; margin:10px;">
-      <img src="${producto.imagen}" width="200">
-      <h3>${producto.nombre}</h3>
-      <p>$${producto.precio}</p>
-    </div>
-  `;
+      html += `
+        <div style="padding:20px; border:1px solid #ccc; margin:10px;">
+          <img src="${producto.imagen}" width="200">
+          <h3>${producto.nombre}</h3>
+          <p>$${producto.precio}</p>
+        </div>
+      `;
 
-});
+    });
 
-document.getElementById("productos").innerHTML = html;
+    document.getElementById("productos").innerHTML = html;
 
   } else {
 

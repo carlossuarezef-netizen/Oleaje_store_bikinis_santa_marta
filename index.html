@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OLEAJE STORE – Bikinis y Moda Playera</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sand: #c8a96e;
+      --sand-light: #dfc090;
+      --cream: #f5f0e8;
+      --dark: #1a1510;
+      --dark-mid: #2d2419;
+      --text: #3a2e22;
+      --white: #ffffff;
+      --gray: #8a7a6a;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+    /* ───── TOP BAR ───── */
+    .top-bar { background: var(--dark); color: var(--sand-light); font-size: 11px; font-weight: 400; letter-spacing: 0.08em; display: flex; justify-content: center; align-items: center; height: 36px; overflow: hidden; }
+    .top-bar-items { display: flex; gap: 0; width: 100%; justify-content: center; align-items: center; }
+    .top-bar-item { display: flex; align-items: center; gap: 7px; padding: 0 28px; border-right: 1px solid rgba(200,169,110,0.25); white-space: nowrap; }
+    .top-bar-item:last-child { border-right: none; }
+    .top-bar-item svg { opacity: 0.8; flex-shrink: 0; }
+    #announcementBar { background: var(--sand); color: var(--dark); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-align: center; padding: 8px 20px; display: none; }
+
+    /* ───── NAVBAR ───── */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.97); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(200,169,110,0.18); height: 70px; display: flex; align-items: center; padding: 0 40px; justify-content: space-between; }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; letter-spacing: 0.25em; color: var(--dark); text-decoration: none; text-transform: uppercase; display: flex; flex-direction: column; line-height: 1; }
+    .nav-logo span { font-size: 9px; letter-spacing: 0.45em; font-family: 'Montserrat', sans-serif; font-weight: 400; color: var(--gray); margin-top: 3px; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.15em; color: var(--dark); text-transform: uppercase; position: relative; padding-bottom: 4px; transition: color 0.2s; }
+    .nav-links a.active::after, .nav-links a:hover::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1.5px; background: var(--sand); }
+    .nav-links a.active { color: var(--sand); }
+    .nav-icons { display: flex; align-items: center; gap: 20px; }
+    .nav-icons a { color: var(--dark); text-decoration: none; display: flex; align-items: center; position: relative; transition: color 0.2s; }
+    .nav-icons a:hover { color: var(--sand); }
+    .cart-badge { position: absolute; top: -7px; right: -8px; background: var(--sand); color: white; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+    /* ───── HERO ───── */
+    .hero { position: relative; height: 100vh; min-height: 680px; overflow: hidden; display: flex; align-items: center; }
+    .hero-slides { position: absolute; inset: 0; }
+    .hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; }
+    .hero-slide.active { opacity: 1; }
+    .hero-slide img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(105deg, rgba(15,10,5,0.72) 0%, rgba(15,10,5,0.38) 55%, rgba(15,10,5,0.05) 100%); }
+    .hero-content { position: relative; z-index: 2; padding: 0 80px; max-width: 620px; animation: heroFadeIn 1.2s ease forwards; }
+    @keyframes heroFadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.35em; color: var(--sand-light); text-transform: uppercase; margin-bottom: 20px; }
+    .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(52px, 6vw, 82px); font-weight: 300; line-height: 1.05; color: var(--white); margin-bottom: 22px; letter-spacing: 0.02em; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.65; margin-bottom: 42px; font-weight: 300; max-width: 380px; }
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary { background: var(--sand); color: var(--white); border: none; padding: 14px 34px; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: background 0.25s, transform 0.2s; display: inline-block; }
+    .btn-primary:hover { background: var(--sand-light); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.65); padding: 14px 34px; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: border-color 0.25s, background 0.25s; display: inline-block; }
+    .btn-outline:hover { border-color: var(--sand); background: rgba(200,169,110,0.15); }
+    .hero-dots { position: absolute; bottom: 38px; left: 80px; display: flex; gap: 10px; z-index: 3; }
+    .hero-dot { width: 28px; height: 2px; background: rgba(255,255,255,0.35); cursor: pointer; transition: background 0.3s, width 0.3s; }
+    .hero-dot.active { background: var(--sand); width: 44px; }
+    .hero-scroll { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 6px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+    .hero-scroll svg { opacity: 0.7; }
+
+    /* ───── FEATURES BAR ───── */
+    .features-bar { background: var(--white); border-bottom: 1px solid rgba(200,169,110,0.15); display: flex; justify-content: center; }
+    .features-inner { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 1100px; width: 100%; }
+    .feature-item { display: flex; align-items: flex-start; gap: 18px; padding: 36px 32px; border-right: 1px solid rgba(200,169,110,0.15); }
+    .feature-item:last-child { border-right: none; }
+    .feature-icon { width: 42px; height: 42px; flex-shrink: 0; color: var(--sand); }
+    .feature-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dark); margin-bottom: 6px; }
+    .feature-desc { font-size: 12px; color: var(--gray); line-height: 1.55; font-weight: 300; }
+
+    /* ───── COLLECTION SECTION ───── */
+    .section { padding: 80px 40px; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 4vw, 48px); font-weight: 300; letter-spacing: 0.12em; text-align: center; color: var(--dark); text-transform: uppercase; margin-bottom: 12px; }
+    .section-line { width: 50px; height: 1px; background: var(--sand); margin: 0 auto 40px; }
+    .collection-tabs { display: flex; justify-content: center; gap: 0; margin-bottom: 50px; border-bottom: 1px solid rgba(200,169,110,0.2); }
+    .tab-btn { background: none; border: none; padding: 12px 28px; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); cursor: pointer; position: relative; transition: color 0.2s; }
+    .tab-btn.active { color: var(--dark); }
+    .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--sand); }
+    .products-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+    .product-card { background: var(--white); position: relative; overflow: hidden; cursor: pointer; transition: transform 0.3s; }
+    .product-card:hover { transform: translateY(-4px); }
+    .product-card:hover .product-img img { transform: scale(1.06); }
+    .product-badge { position: absolute; top: 14px; left: 14px; background: var(--dark); color: var(--sand-light); font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; z-index: 2; }
+    .product-badge.agotado { background: #9b9187; color: #fff; }
+    .product-wish { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; transition: background 0.2s; }
+    .product-wish:hover { background: var(--sand); }
+    .product-wish:hover svg path { stroke: white; }
+    .product-img { overflow: hidden; aspect-ratio: 3/4; }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .product-info { padding: 16px 18px 20px; }
+    .product-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 400; color: var(--dark); margin-bottom: 4px; }
+    .product-cat { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 10px; }
+    .product-price { font-size: 14px; font-weight: 600; color: var(--dark); }
+    .product-add { width: 100%; background: var(--dark); color: var(--sand-light); border: none; padding: 11px; font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; margin-top: 14px; transition: background 0.25s; }
+    .product-add:hover { background: var(--sand); color: white; }
+
+    /* ── COLOR SWATCHES on card ── */
+    .product-colors { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+    .color-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.15s; flex-shrink: 0; }
+    .color-dot:hover { transform: scale(1.2); }
+
+    /* ───── BANNER SECTION ───── */
+    .banner-section { position: relative; height: 480px; overflow: hidden; display: flex; align-items: center; }
+    .banner-section img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+    .banner-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(15,10,5,0.75) 0%, rgba(15,10,5,0.2) 100%); }
+    .banner-content { position: relative; z-index: 2; padding: 0 80px; max-width: 540px; }
+    .banner-eyebrow { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--sand-light); margin-bottom: 18px; }
+    .banner-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 4vw, 56px); font-weight: 300; color: white; line-height: 1.1; margin-bottom: 20px; }
+    .banner-sub { font-size: 13px; color: rgba(255,255,255,0.78); line-height: 1.65; margin-bottom: 34px; font-weight: 300; }
+
+    /* ───── TESTIMONIALS ───── */
+    .testimonials { background: var(--dark); padding: 80px 40px; }
+    .testimonials .section-title { color: var(--cream); }
+    .testimonials .section-line { background: var(--sand); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 1100px; margin: 0 auto; }
+    .testimonial-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(200,169,110,0.2); padding: 36px 30px; }
+    .testimonial-stars { display: flex; gap: 4px; margin-bottom: 18px; }
+    .star { color: var(--sand); font-size: 14px; }
+    .testimonial-text { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.85); line-height: 1.65; margin-bottom: 24px; }
+    .testimonial-author { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sand); }
+    .testimonial-loc { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 0.08em; }
+
+    /* ───── INSTAGRAM SECTION ───── */
+    .insta-section { padding: 80px 40px; background: var(--cream); }
+    .insta-title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 300; text-align: center; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dark); margin-bottom: 8px; }
+    .insta-handle { text-align: center; font-size: 12px; color: var(--sand); letter-spacing: 0.1em; margin-bottom: 40px; cursor: pointer; }
+    .insta-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 1100px; margin: 0 auto; }
+    .insta-item { aspect-ratio: 1; overflow: hidden; position: relative; cursor: pointer; }
+    .insta-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s, filter 0.3s; }
+    .insta-item:hover img { transform: scale(1.08); filter: brightness(0.85); }
+    .insta-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; background: rgba(200,169,110,0.18); }
+    .insta-item:hover .insta-overlay { opacity: 1; }
+    .insta-overlay svg { color: white; }
+
+    /* ───── FOOTER ───── */
+    footer { background: var(--dark-mid); color: rgba(255,255,255,0.6); padding: 60px 40px 0; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 50px; max-width: 1100px; margin: 0 auto; padding-bottom: 50px; border-bottom: 1px solid rgba(200,169,110,0.12); }
+    .footer-brand-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.25em; color: var(--white); text-transform: uppercase; margin-bottom: 3px; }
+    .footer-brand-sub { font-size: 9px; letter-spacing: 0.45em; color: var(--sand); text-transform: uppercase; margin-bottom: 18px; }
+    .footer-desc { font-size: 12px; line-height: 1.75; max-width: 260px; margin-bottom: 24px; }
+    .footer-socials { display: flex; gap: 14px; }
+    .footer-social { width: 36px; height: 36px; border: 1px solid rgba(200,169,110,0.35); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; text-decoration: none; color: rgba(255,255,255,0.6); }
+    .footer-social:hover { border-color: var(--sand); background: rgba(200,169,110,0.12); color: var(--sand); }
+    .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--white); margin-bottom: 22px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+    .footer-links a { text-decoration: none; color: rgba(255,255,255,0.5); font-size: 12px; letter-spacing: 0.04em; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--sand); }
+    .footer-bottom { max-width: 1100px; margin: 0 auto; padding: 20px 0; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+    .footer-bottom a { color: var(--sand); text-decoration: none; }
+
+    /* ───── FLOATING BUTTONS ───── */
+    .floating-btns { position: fixed; right: 20px; bottom: 80px; display: flex; flex-direction: column; gap: 12px; z-index: 200; }
+    .float-btn { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: transform 0.25s, box-shadow 0.25s; }
+    .float-btn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,0,0,0.3); }
+    .float-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+    .float-whatsapp { background: #25D366; }
+
+    /* ───── POPUP NOTIFICATION ───── */
+    .popup-notif { position: fixed; bottom: 24px; left: 24px; background: white; border-left: 3px solid var(--sand); box-shadow: 0 8px 32px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 14px; padding: 14px 18px; max-width: 280px; z-index: 200; animation: slideIn 0.5s ease forwards; cursor: pointer; }
+    @keyframes slideIn { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .popup-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .popup-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .popup-text strong { display: block; font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .popup-text span { font-size: 11px; color: var(--gray); display: block; margin-bottom: 3px; }
+    .popup-stars { display: flex; gap: 2px; }
+    .popup-stars .star { font-size: 11px; }
+
+    /* ───── MODAL OVERLAY ───── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; max-width: 460px; width: 92%; padding: 36px 40px; position: relative; max-height: 90vh; overflow-y: auto; }
+    .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); }
+    .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 0.1em; margin-bottom: 24px; color: var(--dark); }
+
+    /* ───── CART MODAL ───── */
+    .cart-items { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+    .cart-item { display: flex; gap: 16px; align-items: center; }
+    .cart-item-img { width: 72px; height: 90px; object-fit: cover; flex-shrink: 0; }
+    .cart-item-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .cart-item-opts { font-size: 11px; color: var(--gray); margin-bottom: 4px; }
+    .cart-item-price { font-size: 13px; color: var(--gray); }
+    .cart-total { border-top: 1px solid rgba(200,169,110,0.2); padding-top: 18px; display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 24px; }
+    .empty-cart { text-align: center; color: var(--gray); padding: 30px 0; font-size: 14px; }
+
+    /* ───── PRODUCT DETAIL MODAL ───── */
+    .prod-detail-modal { background: white; width: 96%; max-width: 960px; position: relative; max-height: 92vh; overflow: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    .prod-detail-gallery { background: var(--cream); position: relative; display: flex; flex-direction: row; overflow: hidden; }
+
+    /* ── MAIN SLIDER ── */
+    .prod-slider-wrap { position: relative; overflow: hidden; flex: 1; background: var(--cream); display: flex; align-items: stretch; }
+    .prod-slides { display: flex; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); will-change: transform; width: 100%; }
+    .prod-slide { min-width: 100%; display: flex; align-items: center; justify-content: center; background: var(--cream); }
+    .prod-detail-main-img { width: 100%; height: 100%; max-height: 500px; object-fit: contain; display: block; }
+
+    /* ── SLIDER ARROWS ── */
+    .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.92); border: none; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; transition: background 0.2s, opacity 0.2s; opacity: 0; }
+    .prod-slider-wrap:hover .slider-arrow { opacity: 1; }
+    .slider-arrow:hover { background: var(--sand); color: white; }
+    .slider-arrow svg { pointer-events: none; }
+    .slider-arrow.prev { left: 8px; }
+    .slider-arrow.next { right: 8px; }
+    .slider-arrow.hidden { display: none; }
+
+    /* ── SLIDER DOTS ── */
+    .slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 4; }
+    .slider-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); border: none; cursor: pointer; padding: 0; transition: background 0.3s, width 0.3s; }
+    .slider-dot.active { background: var(--sand); width: 18px; border-radius: 3px; }
+
+    /* ── THUMBNAILS ── */
+    .prod-thumbs { display: flex; flex-direction: column; gap: 5px; padding: 8px 6px; background: #ece8e0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; width: 76px; flex-shrink: 0; align-self: stretch; }
+    .prod-thumbs::-webkit-scrollbar { display: none; }
+    .prod-thumb { width: 60px; height: 76px; object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s, opacity 0.2s; opacity: 0.55; flex-shrink: 0; border-radius: 2px; display: block; }
+    .prod-thumb:hover, .prod-thumb.active { border-color: var(--sand); opacity: 1; }
+    .prod-detail-info { padding: 40px 36px; display: flex; flex-direction: column; gap: 0; }
+    .prod-detail-cat { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+    .prod-detail-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; color: var(--dark); margin-bottom: 12px; line-height: 1.2; letter-spacing: 0.02em; }
+    .prod-detail-price { font-size: 20px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .prod-detail-price-orig { font-size: 13px; text-decoration: line-through; color: var(--gray); font-weight: 400; margin-bottom: 20px; }
+    .prod-detail-desc { font-size: 13px; color: var(--gray); line-height: 1.75; margin-bottom: 24px; border-top: 1px solid rgba(200,169,110,0.2); padding-top: 20px; }
+    .prod-detail-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; color: var(--dark); margin-bottom: 10px; }
+    .size-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+    .size-btn { border: 1px solid rgba(58,46,34,0.2); background: transparent; padding: 7px 16px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; }
+    .size-btn:hover { border-color: var(--sand); color: var(--sand); }
+    .size-btn.selected { background: var(--dark); color: var(--sand-light); border-color: var(--dark); }
+    .color-options { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+    .color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; outline: none; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
+    .color-btn:hover { transform: scale(1.15); }
+    .color-btn.selected { border-color: var(--dark); box-shadow: 0 0 0 2px var(--sand); }
+    .add-to-cart-btn { width: 100%; background: var(--dark); color: var(--sand-light); border: none; padding: 15px; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; margin-top: auto; transition: background 0.25s; font-family: 'Montserrat', sans-serif; }
+    .add-to-cart-btn:hover { background: var(--sand); color: white; }
+    .add-to-cart-btn.agotado { background: #b0a89a; color: #fff; cursor: default; }
+    .add-to-cart-btn.agotado:hover { background: #b0a89a; }
+    .prod-detail-stock { font-size: 11px; color: var(--gray); margin-bottom: 16px; }
+    .encargo-notice { background: #fdf6ec; border-left: 3px solid var(--sand); padding: 12px 14px; margin-bottom: 16px; display: none; }
+    .encargo-notice p { font-size: 11px; color: #7a6a55; line-height: 1.6; margin: 0; }
+    .encargo-notice strong { color: var(--sand); font-size: 12px; display: block; margin-bottom: 4px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    /* ───── TALLAS ───── */
+    .tallas-section { padding: 80px 40px; background: var(--white); }
+    .tallas-table { max-width: 700px; margin: 0 auto; border-collapse: collapse; width: 100%; font-size: 13px; }
+    .tallas-table th { background: var(--dark); color: var(--sand-light); padding: 12px 20px; text-align: left; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; }
+    .tallas-table td { padding: 13px 20px; border-bottom: 1px solid rgba(200,169,110,0.15); color: var(--text); }
+    .tallas-table tr:hover td { background: rgba(200,169,110,0.05); }
+
+    /* ───── CHECKOUT MODAL ───── */
+    .checkout-modal { background: white; width: 92%; max-width: 560px; position: relative; max-height: 92vh; overflow-y: auto; padding: 40px; }
+    .checkout-step { display: none; }
+    .checkout-step.active { display: block; }
+    .checkout-input { width: 100%; border: 1px solid rgba(58,46,34,0.18); background: #faf7f2; padding: 12px 15px; font-size: 13px; color: var(--text); outline: none; font-family: 'Montserrat', sans-serif; transition: border-color 0.2s; margin-bottom: 14px; }
+    .checkout-input:focus { border-color: var(--sand); }
+    .checkout-input::placeholder { color: var(--gray); }
+    .checkout-label { display: block; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; color: var(--gray); margin-bottom: 6px; }
+    .pay-method-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .pay-method-option { border: 1.5px solid rgba(58,46,34,0.14); padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: all 0.2s; }
+    .pay-method-option:hover { border-color: var(--sand); background: rgba(200,169,110,0.04); }
+    .pay-method-option.selected { border-color: var(--sand); background: rgba(200,169,110,0.08); }
+    .pay-method-option input[type=radio] { accent-color: var(--sand); width: 16px; height: 16px; flex-shrink: 0; }
+    .pay-method-icon { font-size: 22px; flex-shrink: 0; }
+    .pay-method-name { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .pay-method-desc { font-size: 11px; color: var(--gray); margin-top: 2px; }
+    .pay-info-box { background: #faf7f2; border: 1px solid rgba(200,169,110,0.3); border-left: 3px solid var(--sand); padding: 16px 18px; margin-top: 14px; font-size: 12px; line-height: 1.8; color: var(--text); display: none; }
+    .pay-info-box.visible { display: block; }
+    .pay-info-box strong { color: var(--dark); font-size: 13px; }
+    .checkout-btn { width: 100%; background: var(--dark); color: var(--sand-light); border: none; padding: 15px; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: background 0.25s; font-family: 'Montserrat', sans-serif; margin-top: 8px; }
+    .checkout-btn:hover { background: var(--sand); color: white; }
+    .checkout-btn-back { background: transparent; border: 1px solid rgba(58,46,34,0.2); color: var(--gray); width: 100%; padding: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; font-family: 'Montserrat', sans-serif; margin-top: 8px; transition: border-color 0.2s; }
+    .checkout-btn-back:hover { border-color: var(--sand); color: var(--text); }
+    .checkout-summary { border-top: 1px solid rgba(200,169,110,0.2); padding-top: 16px; margin-bottom: 20px; }
+    .checkout-summary-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: var(--gray); }
+    .checkout-summary-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--dark); padding-top: 10px; border-top: 1px solid rgba(200,169,110,0.2); margin-top: 6px; }
+    .coupon-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .coupon-input { flex: 1; border: 1px solid rgba(58,46,34,0.18); background: #faf7f2; padding: 11px 14px; font-size: 12px; color: var(--text); outline: none; font-family: 'Montserrat', sans-serif; letter-spacing: 0.05em; }
+    .coupon-input:focus { border-color: var(--sand); }
+    .coupon-apply-btn { background: var(--sand); color: var(--dark); border: none; padding: 0 18px; font-size: 10px; font-weight: 700; letter-spacing: 0.15em; cursor: pointer; font-family: 'Montserrat', sans-serif; text-transform: uppercase; transition: background 0.2s; }
+    .coupon-apply-btn:hover { background: var(--sand-light); }
+    .coupon-msg { font-size: 11px; margin-bottom: 10px; }
+    .coupon-msg.success { color: #3a6b4a; }
+    .coupon-msg.error { color: #9b2335; }
+    .hidden { display: none !important; }
+
+    /* ═══════════════════════════════════
+       MOBILE RESPONSIVE — 768px y menos
+    ═══════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* Top bar */
+      .top-bar { display: none; }
+
+      /* Navbar */
+      nav { padding: 0 20px; height: 60px; }
+      .nav-links { display: none; }
+      .nav-logo { font-size: 18px; }
+
+      /* Mobile hamburger placeholder */
+      .nav-icons { gap: 14px; }
+
+      /* Hero */
+      .hero { min-height: 100svh; }
+      .hero-content { padding: 0 24px; max-width: 100%; }
+      .hero-sub { max-width: 100%; }
+      .hero-dots { left: 24px; }
+
+      /* Features bar */
+      .features-inner { grid-template-columns: 1fr 1fr; }
+      .feature-item { padding: 22px 18px; border-right: none; border-bottom: 1px solid rgba(200,169,110,0.15); }
+      .feature-item:nth-child(1), .feature-item:nth-child(2) { }
+      .feature-item:nth-child(odd) { border-right: 1px solid rgba(200,169,110,0.15); }
+      .feature-item:nth-child(3), .feature-item:nth-child(4) { border-bottom: none; }
+
+      /* Section */
+      .section { padding: 50px 16px; }
+      .collection-tabs { gap: 0; overflow-x: auto; justify-content: flex-start; padding: 0 8px; }
+      .tab-btn { padding: 10px 16px; white-space: nowrap; }
+
+      /* Products grid */
+      .products-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .product-info { padding: 12px 14px 16px; }
+      .product-name { font-size: 15px; }
+
+      /* Banner */
+      .banner-section { height: 360px; }
+      .banner-content { padding: 0 24px; }
+
+      /* Testimonials */
+      .testimonials { padding: 50px 16px; }
+      .testimonials-grid { grid-template-columns: 1fr; gap: 16px; }
+
+      /* Instagram */
+      .insta-section { padding: 50px 16px; }
+      .insta-grid { grid-template-columns: repeat(3, 1fr); }
+      .insta-item:nth-child(4), .insta-item:nth-child(5) { display: none; }
+
+      /* Tallas */
+      .tallas-section { padding: 50px 16px; }
+      .tallas-table { font-size: 12px; }
+      .tallas-table th, .tallas-table td { padding: 10px 12px; }
+
+      /* Footer */
+      footer { padding: 40px 20px 0; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+
+      /* Product detail modal — móvil: mismo layout que PC (thumbs izq + imagen der) */
+      .prod-detail-modal { grid-template-columns: 1fr; width: 100%; max-width: 100%; max-height: 100svh; border-radius: 0; margin: 0; height: 100svh; overflow-y: auto; }
+      .prod-detail-gallery { flex-direction: row; position: sticky; top: 0; z-index: 2; }
+      .prod-thumbs { flex-direction: column; width: 64px; overflow-y: auto; overflow-x: hidden; height: auto; padding: 6px 5px; align-self: stretch; }
+      .prod-thumb { width: 52px; height: 66px; }
+      .prod-slider-wrap { flex: 1; }
+      .prod-detail-main-img { max-height: 380px; }
+      .prod-detail-info { padding: 20px 18px 40px; }
+      .prod-detail-name { font-size: 20px; }
+
+      /* Cart/checkout modal */
+      .modal { padding: 28px 20px; }
+      .checkout-modal { padding: 28px 20px; max-height: 100svh; width: 100%; max-width: 100%; }
+
+      /* Floating buttons */
+      .floating-btns { right: 14px; bottom: 70px; }
+
+      /* Popup */
+      .popup-notif { max-width: 240px; left: 12px; bottom: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
+      .hero-btns { flex-direction: column; }
+      .btn-primary, .btn-outline { text-align: center; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div id="announcementBar"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-items">
+    <div class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Envíos a toda Colombia 🇨🇴
+    </div>
+    <div class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Pagos 100% seguros
+    </div>
+    <div class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Cambios fáciles y rápidos
+    </div>
+    <div class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.37 2 2 0 0 1 3.57 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Atención personalizada
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="#inicio" class="nav-logo" id="navLogo">OLEAJE<span>STORE</span></a>
+  <ul class="nav-links">
+    <li><a href="#inicio" class="active">Inicio</a></li>
+    <li><a href="#coleccion">Colección</a></li>
+    <li><a href="#coleccion" onclick="filterTab('bikinis')">Bikinis</a></li>
+    <li><a href="#coleccion" onclick="filterTab('vestidos')">Vestidos</a></li>
+    <li><a href="#coleccion" onclick="filterTab('accesorios')">Accesorios</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#tallas">Guía de Tallas</a></li>
+  </ul>
+  <div class="nav-icons">
+    <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></a>
+    <a href="#" onclick="openCart(); return false;" style="position:relative;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="cart-badge" id="cartCount">0</span>
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-slides" id="heroSlides">
+    <div class="hero-slide active">
+      <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80" alt="Playa caribe" />
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1600&q=80" alt="Moda playera" />
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1600&q=80" alt="Playa colombia" />
+    </div>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Espíritu Oleaje</p>
+    <h1 class="hero-title" id="heroTitle">Hecha para<br>el sol, el mar<br>y el Caribe</h1>
+    <p class="hero-sub" id="heroSub">Bikinis y moda playera inspirada en la libertad de Santa Marta.</p>
+    <div class="hero-btns">
+      <a href="#coleccion" class="btn-primary" id="heroBtn">Comprar ahora</a>
+      <a href="#coleccion" class="btn-outline">Nueva colección</a>
+    </div>
+  </div>
+  <div class="hero-dots">
+    <div class="hero-dot active" onclick="goSlide(0)"></div>
+    <div class="hero-dot" onclick="goSlide(1)"></div>
+    <div class="hero-dot" onclick="goSlide(2)"></div>
+  </div>
+  <div class="hero-scroll">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</section>
+
+<!-- FEATURES BAR -->
+<div class="features-bar">
+  <div class="features-inner">
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div><p class="feature-title">Materiales Premium</p><p class="feature-desc">Telas de alta calidad que cuidan tu piel y el planeta.</p></div>
+    </div>
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <div><p class="feature-title">Diseños Exclusivos</p><p class="feature-desc">Piezas únicas inspiradas en el Caribe colombiano.</p></div>
+    </div>
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <div><p class="feature-title">Envíos a todo Colombia</p><p class="feature-desc">Rápidos, seguros y confiables a cualquier destino.</p></div>
+    </div>
+    <div class="feature-item">
+      <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      <div><p class="feature-title">Cambios Fáciles</p><p class="feature-desc">Tu satisfacción es nuestra prioridad.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- COLLECTION SECTION -->
+<section class="section" id="coleccion">
+  <h2 class="section-title">Descubre Nuestra Colección</h2>
+  <div class="section-line"></div>
+  <div class="collection-tabs">
+    <button class="tab-btn active" onclick="filterTab('todos', this)">Todos</button>
+    <button class="tab-btn" onclick="filterTab('bikinis', this)">Bikinis</button>
+    <button class="tab-btn" onclick="filterTab('vestidos', this)">Vestidos</button>
+    <button class="tab-btn" onclick="filterTab('accesorios', this)">Accesorios</button>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+  <div style="text-align:center; margin-top: 50px;">
+    <a href="#coleccion" class="btn-primary">Ver toda la colección</a>
+  </div>
+</section>
+
+<!-- BANNER -->
+<section class="banner-section">
+  <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600&q=80" alt="Nueva coleccion" />
+  <div class="banner-overlay"></div>
+  <div class="banner-content">
+    <p class="banner-eyebrow">Nueva temporada</p>
+    <h2 class="banner-title">Colección<br>Verano 2025</h2>
+    <p class="banner-sub">Descubre las últimas piezas inspiradas en el alma libre del Caribe. Diseñadas para mujeres que viven el mar.</p>
+    <a href="#coleccion" class="btn-primary">Explorar ahora</a>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="nosotros">
+  <h2 class="section-title">Lo que dicen nuestras clientas</h2>
+  <div class="section-line"></div>
+  <div class="testimonials-grid" id="testimonialsGrid">
+    <div class="testimonial-card">
+      <div class="testimonial-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+      <p class="testimonial-text">"La calidad de los bikinis es increíble, se siente premium en cada costura. ¡Los usé todo el viaje a Cartagena!"</p>
+      <p class="testimonial-author">María P.</p><p class="testimonial-loc">Cartagena, Colombia</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+      <p class="testimonial-text">"Pedí el vestido playero y llegó en 2 días perfectamente empacado. El diseño es único, no lo ves en ningún lado."</p>
+      <p class="testimonial-author">Valentina R.</p><p class="testimonial-loc">Bogotá, Colombia</p>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+      <p class="testimonial-text">"Me enamoré del Bikini Olas desde la primera foto. En persona es aún más hermoso. Definitivamente volveré a comprar."</p>
+      <p class="testimonial-author">Sofía M.</p><p class="testimonial-loc">Medellín, Colombia</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM GRID -->
+<section class="insta-section">
+  <h2 class="insta-title">Síguenos en Instagram</h2>
+  <p class="insta-handle" id="instaHandle" onclick="openInstagram()">@oleajestore</p>
+  <div class="insta-grid">
+    <div class="insta-item"><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" alt="insta"/><div class="insta-overlay"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div></div>
+    <div class="insta-item"><img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&q=80" alt="insta"/><div class="insta-overlay"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div></div>
+    <div class="insta-item"><img src="https://images.unsplash.com/photo-1476673160081-cf065607f449?w=400&q=80" alt="insta"/><div class="insta-overlay"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div></div>
+    <div class="insta-item"><img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&q=80" alt="insta"/><div class="insta-overlay"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div></div>
+    <div class="insta-item"><img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&q=80" alt="insta"/><div class="insta-overlay"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div></div>
+  </div>
+</section>
+
+<!-- TALLAS -->
+<section class="tallas-section" id="tallas">
+  <h2 class="section-title">Guía de Tallas</h2>
+  <div class="section-line"></div>
+  <table class="tallas-table">
+    <thead><tr><th>Talla</th><th>Busto (cm)</th><th>Cintura (cm)</th><th>Cadera (cm)</th></tr></thead>
+    <tbody>
+      <tr><td>XS</td><td>78 – 82</td><td>60 – 64</td><td>85 – 89</td></tr>
+      <tr><td>S</td><td>83 – 87</td><td>65 – 69</td><td>90 – 94</td></tr>
+      <tr><td>M</td><td>88 – 92</td><td>70 – 74</td><td>95 – 99</td></tr>
+      <tr><td>L</td><td>93 – 97</td><td>75 – 79</td><td>100 – 104</td></tr>
+      <tr><td>XL</td><td>98 – 102</td><td>80 – 84</td><td>105 – 109</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name" id="footerBrand">OLEAJE</div>
+      <div class="footer-brand-sub">STORE</div>
+      <p class="footer-desc">Bikinis y moda playera inspirada en la libertad de Santa Marta y el Caribe colombiano. Hecha para mujeres que viven el mar.</p>
+      <div class="footer-socials">
+        <a href="#" id="footerInstaLink" target="_blank" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="#" id="footerWaLink" target="_blank" class="footer-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <p class="footer-col-title">Tienda</p>
+      <ul class="footer-links">
+        <li><a href="#coleccion">Nueva Colección</a></li>
+        <li><a href="#coleccion" onclick="filterTab('bikinis')">Bikinis</a></li>
+        <li><a href="#coleccion" onclick="filterTab('vestidos')">Vestidos</a></li>
+        <li><a href="#coleccion" onclick="filterTab('accesorios')">Accesorios</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Información</p>
+      <ul class="footer-links">
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#tallas">Guía de Tallas</a></li>
+        <li><a href="#">Política de envíos</a></li>
+        <li><a href="#">Cambios y devoluciones</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Contacto</p>
+      <ul class="footer-links">
+        <li><a href="#" id="footerWaText">WhatsApp</a></li>
+        <li><a href="#" id="footerInstaText">Instagram</a></li>
+        <li><a href="#" id="footerEmail">hola@oleajestore.com</a></li>
+        <li><a href="#" id="footerCiudad">Santa Marta, Colombia</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span id="footerCopy">© 2025 Oleaje Store. Todos los derechos reservados.</span>
+    <span>Hecho con ♥ en Santa Marta 🇨🇴</span>
+  </div>
+</footer>
+
+<!-- FLOATING BUTTONS -->
+<div class="floating-btns">
+  <a href="#" id="floatInsta" target="_blank" class="float-btn float-instagram" title="Instagram">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+  </a>
+  <a href="#" id="floatWa" target="_blank" class="float-btn float-whatsapp" title="WhatsApp">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+  </a>
+</div>
+<div style="position:fixed; bottom:24px; right:84px; background:white; border-radius:20px 20px 4px 20px; padding:8px 14px; font-size:12px; font-weight:500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); z-index:199; color:var(--dark);">
+  ¿Necesitas ayuda?<br><span style="color:var(--gray); font-size:10px;">Escríbenos por WhatsApp</span>
+</div>
+
+<!-- POPUP NOTIFICATION -->
+<div class="popup-notif" id="popupNotif" onclick="this.style.display='none'">
+  <div class="popup-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80" alt="María P." /></div>
+  <div class="popup-text">
+    <strong>María P. en Cartagena</strong>
+    <span>Compró Bikini Olas<br>hace 1 hora</span>
+    <div class="popup-stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+  </div>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal-overlay" id="cartModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeCart()">×</button>
+    <h2>Tu carrito</h2>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-total" id="cartTotal" style="display:none"><span>Total</span><span id="totalAmount">$0</span></div>
+    <button class="btn-primary" id="checkoutBtn" style="width:100%;display:none" onclick="openCheckout()">Finalizar compra</button>
+    <div class="empty-cart" id="emptyCart">Tu carrito está vacío</div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="prod-detail-modal" id="productModalInner">
+    <button class="modal-close" onclick="closeProductModal()" style="z-index:10">×</button>
+    <!-- Gallery side -->
+    <div class="prod-detail-gallery">
+      <!-- Thumbnails: columna izquierda -->
+      <div class="prod-thumbs" id="thumbsRow"></div>
+      <!-- Main slider: ocupa el resto -->
+      <div class="prod-slider-wrap" id="sliderWrap">
+        <div class="prod-slides" id="prodSlides"></div>
+        <!-- Arrows -->
+        <button class="slider-arrow prev" id="sliderPrev" onclick="sliderMove(-1)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="slider-arrow next" id="sliderNext" onclick="sliderMove(1)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <!-- Dots -->
+        <div class="slider-dots" id="sliderDots"></div>
+      </div>
+    </div>
+    <!-- Info side -->
+    <div class="prod-detail-info">
+      <p class="prod-detail-cat" id="detailCat"></p>
+      <h3 class="prod-detail-name" id="detailName"></h3>
+      <p class="prod-detail-price" id="detailPrice"></p>
+      <p class="prod-detail-price-orig" id="detailPriceOrig" style="display:none"></p>
+      <p class="prod-detail-desc" id="detailDesc"></p>
+
+      <!-- Tallas -->
+      <div id="tallasWrap" style="display:none; margin-bottom:20px">
+        <p class="prod-detail-label">Talla: <span id="selectedSizeLabel" style="font-weight:400;color:var(--sand);font-size:11px"></span></p>
+        <div class="size-options" id="sizeOptions"></div>
+      </div>
+
+      <!-- Colores -->
+      <div id="coloresWrap" style="display:none; margin-bottom:20px">
+        <p class="prod-detail-label">Color: <span id="selectedColorLabel" style="font-weight:400;color:var(--sand);font-size:11px"></span></p>
+        <div class="color-options" id="colorOptions"></div>
+      </div>
+
+      <p class="prod-detail-stock" id="detailStock"></p>
+      <div class="encargo-notice" id="encargoNotice">
+        <p><strong>⏳ Producto bajo encargo</strong>Este producto está agotado actualmente, pero puedes pedirlo bajo encargo. El plazo máximo de entrega es de <strong style="display:inline;font-size:11px;color:#7a6a55;text-transform:none;letter-spacing:0">20 días hábiles</strong> desde la confirmación de tu pedido.</p>
+      </div>
+      <button class="add-to-cart-btn" id="addToCartBtn" onclick="addFromDetail()">Agregar al carrito</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="checkout-modal">
+    <button class="modal-close" onclick="closeCheckout()">×</button>
+
+    <!-- Step 1: Datos cliente -->
+    <div class="checkout-step active" id="step1">
+      <h2>Finalizar compra</h2>
+
+      <!-- Resumen del carrito -->
+      <div class="checkout-summary" id="checkoutSummary"></div>
+
+      <!-- Cupón -->
+      <div class="coupon-row">
+        <input class="coupon-input" id="couponInput" placeholder="Código de cupón" style="text-transform:uppercase" />
+        <button class="coupon-apply-btn" onclick="applyCoupon()">Aplicar</button>
+      </div>
+      <p class="coupon-msg" id="couponMsg"></p>
+
+      <label class="checkout-label">Nombre completo *</label>
+      <input class="checkout-input" id="coNombre" placeholder="Tu nombre completo" />
+      <label class="checkout-label">WhatsApp *</label>
+      <input class="checkout-input" id="coWa" placeholder="+57 300 123 4567" type="tel" />
+      <label class="checkout-label">Ciudad</label>
+      <input class="checkout-input" id="coCiudad" placeholder="Tu ciudad" />
+      <label class="checkout-label">Dirección de entrega</label>
+      <input class="checkout-input" id="coDireccion" placeholder="Calle, número, barrio..." />
+      <button class="checkout-btn" onclick="goToPayStep()">Siguiente → Método de pago</button>
+    </div>
+
+    <!-- Step 2: Método de pago -->
+    <div class="checkout-step" id="step2">
+      <h2>Método de pago</h2>
+      <div class="pay-method-list" id="payMethodList"></div>
+      <div class="pay-info-box" id="payInfoBox"></div>
+      <button class="checkout-btn" onclick="confirmOrder()">✅ Confirmar pedido</button>
+      <button class="checkout-btn-back" onclick="backToStep1()">← Volver</button>
+    </div>
+
+    <!-- Step 3: Confirmación -->
+    <div class="checkout-step" id="step3">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:52px;margin-bottom:16px">🌊</div>
+        <h2 style="text-align:center;margin-bottom:12px">¡Pedido confirmado!</h2>
+        <p style="font-size:13px;color:var(--gray);line-height:1.75;margin-bottom:28px">Gracias por tu compra. Te contactaremos pronto por WhatsApp para coordinar el envío.<br>¡Bienvenida a la familia Oleaje! 🤍</p>
+        <button class="checkout-btn" onclick="closeCheckout()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+  import { getDatabase, ref, onValue, push, get } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",
+    authDomain: "oleaje-store.firebaseapp.com",
+    databaseURL: "https://oleaje-store-default-rtdb.firebaseio.com",
+    projectId: "oleaje-store",
+    storageBucket: "oleaje-store.firebasestorage.app",
+    messagingSenderId: "253321516324",
+    appId: "1:253321516324:web:92696cce4818b5189e8fb1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // ── STATE ──
+  let products = [];
+  let cart = [];
+  let currentFilter = 'todos';
+  let currentProduct = null;
+  let selectedSize = '';
+  let selectedColor = '';
+  let storeConfig = {};
+  let payMethods = [];
+  let payData = {};
+  let coupons = {};
+  let appliedCoupon = null;
+  let reviews = {};
+
+  const DEFAULT_PAY = [
+    {id:'nequi', name:'Nequi', icon:'📱', desc:'Transfiere al número Nequi', active:true},
+    {id:'bancolombia', name:'Bancolombia', icon:'🏦', desc:'Transferencia Bancolombia', active:true},
+    {id:'daviplata', name:'DaviPlata', icon:'💜', desc:'Pago a través de DaviPlata', active:true},
+    {id:'efectivo', name:'Contra entrega', icon:'💵', desc:'Pago en efectivo al recibir', active:true},
+    {id:'llave', name:'Llave (Bre-B)', icon:'🔑', desc:'Transferencia inmediata por llave Bre-B', active:false},
+    {id:'mercadopago', name:'Mercado Pago', icon:'💛', desc:'Tarjeta crédito/débito vía Mercado Pago', active:false},
+    {id:'payu', name:'PayU', icon:'💳', desc:'Pago online seguro con PayU', active:false}
+  ];
+
+  // ── FORMAT ──
+  function fmt(p) { return '$' + Number(p).toLocaleString('es-CO'); }
+  function getBadgeLabel(b) { return {new:'NUEVO', sale:'OFERTA', featured:'DESTACADO', agotado:'AGOTADO'}[b] || b || ''; }
+
+  // ── STORE CONFIG ──
+  onValue(ref(db, 'config/tienda'), snap => {
+    storeConfig = snap.exists() ? snap.val() : {};
+    applyStoreConfig();
+  });
+
+  function applyStoreConfig() {
+    const c = storeConfig;
+    const handle = c.instagram || '@oleajestore';
+    const waNum = (c.whatsapp || '573001234567').replace(/\D/g,'');
+    const cleanInsta = handle.replace('@','');
+    const instaUrl = `https://instagram.com/${cleanInsta}`;
+    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent('¡Hola! Quiero saber más sobre sus productos 🌊')}`;
+
+    // Announcement bar
+    if (c.announcement) {
+      const bar = document.getElementById('announcementBar');
+      bar.textContent = c.announcement;
+      bar.style.display = 'block';
+    }
+
+    // Hero
+    if (c.heroTitle) document.getElementById('heroTitle').innerHTML = c.heroTitle.replace(/\n/g,'<br>');
+    if (c.heroDesc) document.getElementById('heroSub').textContent = c.heroDesc;
+    if (c.heroBtn) document.getElementById('heroBtn').textContent = c.heroBtn;
+
+    // Hero background
+    if (c.heroBg) {
+      const slides = document.getElementById('heroSlides');
+      const firstSlide = slides.querySelector('.hero-slide');
+      if (firstSlide) {
+        const img = firstSlide.querySelector('img');
+        if (img) img.src = c.heroBg;
+      }
+    }
+
+    // Colors
+    if (c.colorPrimary) {
+      document.documentElement.style.setProperty('--sand', c.colorPrimary);
+    }
+    if (c.colorBg) {
+      document.documentElement.style.setProperty('--cream', c.colorBg);
+    }
+
+    // Font
+    if (c.font && c.font !== 'Cormorant Garamond') {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${c.font.replace(/ /g,'+')}:wght@300;400;600&display=swap`;
+      document.head.appendChild(link);
+      document.querySelectorAll('.hero-title, .section-title, .product-name, .footer-brand-name, .modal h2, .prod-detail-name, .insta-title').forEach(el => {
+        el.style.fontFamily = `'${c.font}', serif`;
+      });
+    }
+
+    // Store name
+    if (c.nombre) {
+      document.getElementById('footerBrand').textContent = c.nombre.toUpperCase();
+      document.getElementById('footerCopy').textContent = `© 2025 ${c.nombre}. Todos los derechos reservados.`;
+      document.title = `${c.nombre} – Bikinis y Moda Playera`;
+    }
+
+    // Instagram
+    document.getElementById('instaHandle').textContent = handle;
+    document.getElementById('instaHandle').onclick = () => window.open(instaUrl, '_blank');
+    document.getElementById('footerInstaLink').href = instaUrl;
+    document.getElementById('footerInstaText').href = instaUrl;
+    document.getElementById('footerInstaText').textContent = handle;
+    document.getElementById('floatInsta').href = instaUrl;
+
+    // WhatsApp
+    document.getElementById('footerWaLink').href = waUrl;
+    document.getElementById('footerWaText').href = waUrl;
+    document.getElementById('floatWa').href = waUrl;
+
+    // Email / ciudad
+    if (c.email) {
+      document.getElementById('footerEmail').href = `mailto:${c.email}`;
+      document.getElementById('footerEmail').textContent = c.email;
+    }
+    if (c.ciudad) {
+      document.getElementById('footerCiudad').textContent = c.ciudad;
+    }
+  }
+
+  // Make openInstagram available globally
+  window.openInstagram = () => {
+    const handle = (storeConfig.instagram || 'oleajestore').replace('@','');
+    window.open(`https://instagram.com/${handle}`, '_blank');
+  };
+
+  // ── PAYMENT METHODS ──
+  onValue(ref(db, 'config/metodosPago'), snap => {
+    payMethods = snap.exists() ? snap.val() : [];
+  });
+  onValue(ref(db, 'config/datosPago'), snap => {
+    payData = snap.exists() ? snap.val() : {};
+  });
+
+  // ── COUPONS ──
+  onValue(ref(db, 'cupones'), snap => {
+    coupons = snap.exists() ? snap.val() : {};
+  });
+
+  // ── REVIEWS ──
+  onValue(ref(db, 'resenas'), snap => {
+    reviews = snap.exists() ? snap.val() : {};
+    renderReviews();
+  });
+
+  function renderReviews() {
+    const published = Object.values(reviews).filter(r => r.publicada);
+    if (!published.length) return;
+    const grid = document.getElementById('testimonialsGrid');
+    grid.innerHTML = published.slice(0, 3).map(r => `
+      <div class="testimonial-card">
+        <div class="testimonial-stars">${'<span class="star">★</span>'.repeat(r.calificacion || 5)}</div>
+        <p class="testimonial-text">"${r.comentario}"</p>
+        <p class="testimonial-author">${r.cliente}</p>
+        <p class="testimonial-loc">${r.ciudad || ''}</p>
+      </div>`).join('');
+  }
+
+  // ── PRODUCTS ──
+  onValue(ref(db, 'productos'), snap => {
+    if (snap.exists()) {
+      const data = snap.val();
+      products = Object.entries(data)
+        .map(([k, v]) => ({ ...v, _key: k }))
+        .filter(p => p.activo !== false);
+    } else { products = []; }
+    renderProducts();
+  });
+
+  function renderProducts(filter) {
+    if (filter !== undefined) currentFilter = filter;
+    const grid = document.getElementById('productsGrid');
+    const filtered = currentFilter === 'todos'
+      ? products
+      : products.filter(p => (p.categoria || '').toLowerCase() === currentFilter);
+
+    if (!filtered.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--gray);font-size:13px;letter-spacing:0.1em">No hay productos en esta categoría todavía</div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(p => {
+      const badge = getBadgeLabel(p.badge);
+      const img = p.imagen || '';
+      const colors = (p.colores || []).slice(0, 5);
+      const colorDots = colors.length
+        ? `<div class="product-colors">${colors.map(c => `<span class="color-dot" style="background:${c}" title="${c}"></span>`).join('')}</div>` : '';
+
+      return `
+        <div class="product-card" onclick="openProduct('${p._key}')">
+          ${badge ? `<span class="product-badge${p.badge==='agotado'?' agotado':''}">${badge}</span>` : ''}
+          <button class="product-wish" onclick="event.stopPropagation()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="product-img">
+            ${img
+              ? `<img src="${img}" alt="${p.nombre}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px;background:#f5f0e8\\'>${p.emoji||'👙'}</div>'" />`
+              : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:60px;background:#f5f0e8">${p.emoji||'👙'}</div>`
+            }
+          </div>
+          <div class="product-info">
+            <p class="product-cat">${p.categoria || ''}</p>
+            <h3 class="product-name">${p.nombre}</h3>
+            <p class="product-price">
+              ${fmt(p.precio || 0)}
+              ${(p.precioOrig || 0) > (p.precio || 0) ? `<span style="text-decoration:line-through;color:var(--gray);font-size:12px;margin-left:6px">${fmt(p.precioOrig)}</span>` : ''}
+            </p>
+            ${colorDots}
+            <button class="product-add" onclick="event.stopPropagation();openProduct('${p._key}')">Ver detalles</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── FILTER ──
+  window.filterTab = (cat, btn) => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    else {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        if (b.textContent.toLowerCase() === (cat === 'todos' ? 'todos' : cat)) b.classList.add('active');
+      });
+    }
+    renderProducts(cat);
+  };
+
+  // ── PRODUCT DETAIL MODAL ──
+  let sliderImgs = [];
+  let sliderIdx = 0;
+  let sliderTimer = null;
+
+  function sliderGo(n) {
+    sliderIdx = (n + sliderImgs.length) % sliderImgs.length;
+    document.getElementById('prodSlides').style.transform = `translateX(-${sliderIdx * 100}%)`;
+    // Update thumbs
+    document.querySelectorAll('.prod-thumb').forEach((t, i) => t.classList.toggle('active', i === sliderIdx));
+    // Update dots
+    document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === sliderIdx));
+    // Update arrows visibility
+    const prev = document.getElementById('sliderPrev');
+    const next = document.getElementById('sliderNext');
+    if (prev && next) {
+      prev.classList.toggle('hidden', sliderImgs.length <= 1);
+      next.classList.toggle('hidden', sliderImgs.length <= 1);
+    }
+  }
+
+  window.sliderMove = (dir) => {
+    sliderGo(sliderIdx + dir);
+    resetSliderTimer();
+  };
+
+  function startSliderTimer() {
+    if (sliderImgs.length <= 1) return;
+    sliderTimer = setInterval(() => sliderGo(sliderIdx + 1), 8000);
+  }
+
+  function resetSliderTimer() {
+    clearInterval(sliderTimer);
+    startSliderTimer();
+  }
+
+  window.openProduct = (key) => {
+    const p = products.find(x => x._key === key);
+    if (!p) return;
+    currentProduct = p;
+    selectedSize = '';
+    selectedColor = '';
+
+    document.getElementById('detailCat').textContent = p.categoria || '';
+    document.getElementById('detailName').textContent = p.nombre;
+    document.getElementById('detailPrice').textContent = fmt(p.precio || 0);
+
+    const origEl = document.getElementById('detailPriceOrig');
+    if ((p.precioOrig || 0) > (p.precio || 0)) {
+      origEl.textContent = fmt(p.precioOrig);
+      origEl.style.display = 'block';
+    } else {
+      origEl.style.display = 'none';
+    }
+
+    document.getElementById('detailDesc').textContent = p.descripcion || 'Producto de alta calidad.';
+    const isAgotado = p.badge === 'agotado' || (!p.stock || p.stock === 0);
+    const stockEl = document.getElementById('detailStock');
+    const encargoEl = document.getElementById('encargoNotice');
+    const cartBtn = document.getElementById('addToCartBtn');
+    if (isAgotado) {
+      stockEl.textContent = 'Producto agotado';
+      stockEl.style.color = '#c0392b';
+      encargoEl.style.display = 'block';
+      cartBtn.textContent = 'PEDIR BAJO ENCARGO';
+      cartBtn.classList.add('agotado');
+    } else {
+      stockEl.textContent = p.stock ? `Quedan ${p.stock} en stock` : '';
+      stockEl.style.color = '';
+      encargoEl.style.display = 'none';
+      cartBtn.textContent = 'AGREGAR AL CARRITO';
+      cartBtn.classList.remove('agotado');
+    }
+
+    // ── SLIDER SETUP ──
+    sliderImgs = [p.imagen, ...(p.imagenesExtra || [])].filter(Boolean);
+    sliderIdx = 0;
+    clearInterval(sliderTimer);
+
+    // Build slides
+    const slidesEl = document.getElementById('prodSlides');
+    slidesEl.style.transform = 'translateX(0)';
+    slidesEl.innerHTML = sliderImgs.map((url, i) => `
+      <div class="prod-slide">
+        <img class="prod-detail-main-img" src="${url}" alt="Imagen ${i+1}" loading="${i === 0 ? 'eager' : 'lazy'}" />
+      </div>`).join('');
+
+    // Build dots
+    const dotsEl = document.getElementById('sliderDots');
+    dotsEl.innerHTML = sliderImgs.length > 1
+      ? sliderImgs.map((_, i) => `<button class="slider-dot ${i===0?'active':''}" onclick="sliderGo(${i});resetSliderTimer()"></button>`).join('')
+      : '';
+
+    // Build thumbnails (max 4 visible, scroll for more)
+    const thumbsRow = document.getElementById('thumbsRow');
+    if (sliderImgs.length > 1) {
+      thumbsRow.style.display = 'flex';
+      thumbsRow.innerHTML = sliderImgs.map((url, i) => `
+        <img class="prod-thumb ${i === 0 ? 'active' : ''}" src="${url}" alt="Imagen ${i+1}"
+          onclick="sliderGoThumb(${i})" />`).join('');
+    } else {
+      thumbsRow.style.display = 'none';
+      thumbsRow.innerHTML = '';
+    }
+
+    // Arrows visibility
+    const prev = document.getElementById('sliderPrev');
+    const next = document.getElementById('sliderNext');
+    if (prev && next) {
+      const hide = sliderImgs.length <= 1;
+      prev.classList.toggle('hidden', hide);
+      next.classList.toggle('hidden', hide);
+    }
+
+    // Autoplay
+    startSliderTimer();
+
+    // Pause on hover
+    const wrap = document.getElementById('sliderWrap');
+    wrap.onmouseenter = () => clearInterval(sliderTimer);
+    wrap.onmouseleave = () => startSliderTimer();
+
+    // Touch swipe support
+    let touchStartX = 0;
+    wrap.ontouchstart = (e) => { touchStartX = e.touches[0].clientX; };
+    wrap.ontouchend = (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) { sliderMove(dx < 0 ? 1 : -1); }
+    };
+
+    // Tallas
+    const tallas = p.tallas || [];
+    const tallasWrap = document.getElementById('tallasWrap');
+    const sizeOptions = document.getElementById('sizeOptions');
+    if (tallas.length) {
+      tallasWrap.style.display = 'block';
+      sizeOptions.innerHTML = tallas.map(t => `
+        <button class="size-btn" onclick="selectSize(this,'${t}')">${t}</button>`).join('');
+    } else {
+      tallasWrap.style.display = 'none';
+    }
+    document.getElementById('selectedSizeLabel').textContent = '';
+
+    // Colores
+    const colores = p.colores || [];
+    const coloresWrap = document.getElementById('coloresWrap');
+    const colorOptions = document.getElementById('colorOptions');
+    if (colores.length) {
+      coloresWrap.style.display = 'block';
+      colorOptions.innerHTML = colores.map(c => `
+        <button class="color-btn" style="background:${c}" onclick="selectColor(this,'${c}')" title="${c}"></button>`).join('');
+    } else {
+      coloresWrap.style.display = 'none';
+    }
+    document.getElementById('selectedColorLabel').textContent = '';
+
+    document.getElementById('productModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.sliderGoThumb = (idx) => {
+    sliderGo(idx);
+    resetSliderTimer();
+  };
+
+  window.sliderGo = sliderGo;
+  window.resetSliderTimer = resetSliderTimer;
+
+  window.selectSize = (btn, size) => {
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedSize = size;
+    document.getElementById('selectedSizeLabel').textContent = size;
+  };
+
+  window.selectColor = (btn, color) => {
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedColor = color;
+    document.getElementById('selectedColorLabel').textContent = color;
+  };
+
+  window.addFromDetail = () => {
+    const p = currentProduct;
+    if (!p) return;
+    const tallas = p.tallas || [];
+    const colores = p.colores || [];
+    if (tallas.length && !selectedSize) { alert('Por favor selecciona una talla'); return; }
+    if (colores.length && !selectedColor) { alert('Por favor selecciona un color'); return; }
+    addToCartInternal(p, selectedSize, selectedColor);
+    closeProductModal();
+    openCart();
+  };
+
+  window.closeProductModal = () => {
+    clearInterval(sliderTimer);
+    document.getElementById('productModal').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // ── CART ──
+  function addToCartInternal(product, size, color) {
+    const cartKey = product._key + (size ? '-' + size : '') + (color ? '-' + color : '');
+    const existing = cart.find(c => c._cartKey === cartKey);
+    if (existing) { existing.qty++; }
+    else { cart.push({ ...product, qty: 1, _cartKey: cartKey, selectedSize: size, selectedColor: color }); }
+    updateCartBadge();
+  }
+
+  window.addToCart = (key) => {
+    const p = products.find(x => x._key === key);
+    if (!p) return;
+    openProduct(key);
+  };
+
+  function updateCartBadge() {
+    document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
+  }
+
+  window.openCart = () => {
+    const modal = document.getElementById('cartModal');
+    const itemsEl = document.getElementById('cartItems');
+    const emptyEl = document.getElementById('emptyCart');
+    const totalEl = document.getElementById('cartTotal');
+    const checkBtn = document.getElementById('checkoutBtn');
+    modal.classList.add('open');
+    if (!cart.length) {
+      itemsEl.innerHTML = '';
+      emptyEl.style.display = 'block';
+      totalEl.style.display = 'none';
+      checkBtn.style.display = 'none';
+    } else {
+      emptyEl.style.display = 'none';
+      totalEl.style.display = 'flex';
+      checkBtn.style.display = 'block';
+      itemsEl.innerHTML = cart.map((i, idx) => `
+        <div class="cart-item">
+          ${i.imagen ? `<img class="cart-item-img" src="${i.imagen}" alt="${i.nombre}" />` : `<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;background:#f5f0e8;font-size:28px">${i.emoji||'👙'}</div>`}
+          <div style="flex:1">
+            <div class="cart-item-name">${i.nombre}</div>
+            <div class="cart-item-opts">${[i.selectedSize?'Talla: '+i.selectedSize:'', i.selectedColor?`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${i.selectedColor};margin-right:3px;border:1px solid rgba(0,0,0,0.1);vertical-align:middle"></span>Color`:''].filter(Boolean).join(' · ')}</div>
+            <div class="cart-item-price">${fmt(i.precio)} × ${i.qty}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div style="font-weight:600">${fmt(i.precio * i.qty)}</div>
+            <div style="display:flex;gap:4px">
+              <button onclick="changeQty(${idx},-1)" style="width:22px;height:22px;border:1px solid rgba(58,46,34,0.2);background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">−</button>
+              <button onclick="changeQty(${idx},1)" style="width:22px;height:22px;border:1px solid rgba(58,46,34,0.2);background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">+</button>
+            </div>
+          </div>
+        </div>`).join('');
+      const total = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+      document.getElementById('totalAmount').textContent = fmt(total);
+    }
+  };
+
+  window.changeQty = (idx, delta) => {
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    updateCartBadge();
+    openCart();
+  };
+
+  window.closeCart = () => {
+    document.getElementById('cartModal').classList.remove('open');
+  };
+
+  document.getElementById('cartModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCart();
+  });
+  document.getElementById('productModal').addEventListener('click', function(e) {
+    if (e.target === this) closeProductModal();
+  });
+  document.getElementById('checkoutModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCheckout();
+  });
+
+  // ── CHECKOUT ──
+  window.openCheckout = () => {
+    closeCart();
+    // Reset steps
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step1').classList.add('active');
+    appliedCoupon = null;
+    document.getElementById('couponMsg').textContent = '';
+    document.getElementById('couponInput').value = '';
+    renderCheckoutSummary();
+    document.getElementById('checkoutModal').classList.add('open');
+  };
+
+  window.closeCheckout = () => {
+    document.getElementById('checkoutModal').classList.remove('open');
+  };
+
+  function renderCheckoutSummary() {
+    const el = document.getElementById('checkoutSummary');
+    const subtotal = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+    let discount = 0;
+    if (appliedCoupon) {
+      discount = appliedCoupon.tipo === 'percent'
+        ? Math.round(subtotal * (appliedCoupon.valor / 100))
+        : Math.min(appliedCoupon.valor, subtotal);
+    }
+    const total = subtotal - discount;
+    el.innerHTML = `
+      ${cart.map(i => `<div class="checkout-summary-row"><span>${i.nombre} ×${i.qty}${i.selectedSize?' ('+i.selectedSize+')':''}</span><span>${fmt(i.precio * i.qty)}</span></div>`).join('')}
+      ${discount ? `<div class="checkout-summary-row" style="color:#3a6b4a"><span>Descuento ${appliedCoupon.codigo}</span><span>−${fmt(discount)}</span></div>` : ''}
+      <div class="checkout-summary-total"><span>Total</span><span>${fmt(total)}</span></div>`;
+  }
+
+  window.applyCoupon = () => {
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    const msgEl = document.getElementById('couponMsg');
+    if (!code) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Ingresa un código'; return; }
+    const c = coupons[code];
+    if (!c) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Código no encontrado'; return; }
+    if (!c.activo) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Este cupón está inactivo'; return; }
+    if (c.expiry && new Date(c.expiry) < new Date()) { msgEl.className = 'coupon-msg error'; msgEl.textContent = 'Este cupón venció'; return; }
+    appliedCoupon = { ...c, codigo: code };
+    msgEl.className = 'coupon-msg success';
+    msgEl.textContent = `✅ Cupón aplicado: ${c.tipo === 'percent' ? c.valor + '% de descuento' : fmt(c.valor) + ' de descuento'}`;
+    renderCheckoutSummary();
+  };
+
+  window.goToPayStep = () => {
+    const nombre = document.getElementById('coNombre').value.trim();
+    const wa = document.getElementById('coWa').value.trim();
+    if (!nombre || !wa) { alert('Por favor ingresa tu nombre y WhatsApp'); return; }
+
+    // Build payment methods list
+    const merged = getMergedPayMethods();
+    const active = merged.filter(m => m.active);
+    const list = document.getElementById('payMethodList');
+    list.innerHTML = active.map((m, i) => `
+      <div class="pay-method-option" onclick="selectPayMethod(this,'${m.id}')">
+        <input type="radio" name="payMethod" value="${m.id}" id="pm_${i}">
+        <span class="pay-method-icon">${m.icon}</span>
+        <div>
+          <p class="pay-method-name">${m.name}</p>
+          <p class="pay-method-desc">${m.desc}</p>
+        </div>
+      </div>`).join('');
+
+    document.getElementById('payInfoBox').textContent = '';
+    document.getElementById('payInfoBox').className = 'pay-info-box';
+
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step2').classList.add('active');
+  };
+
+  function getMergedPayMethods() {
+    if (!payMethods.length) return DEFAULT_PAY;
+    return DEFAULT_PAY.map(def => {
+      const saved = (Array.isArray(payMethods) ? payMethods : Object.values(payMethods)).find(m => m.id === def.id);
+      return saved ? { ...def, active: saved.active } : def;
+    });
+  }
+
+  window.selectPayMethod = (el, methodId) => {
+    document.querySelectorAll('.pay-method-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input[type=radio]').checked = true;
+
+    // Show payment info
+    const d = payData;
+    const infoBox = document.getElementById('payInfoBox');
+    let infoHtml = '';
+    const titular = d.titular ? `<br><strong>Titular:</strong> ${d.titular}` : '';
+    const instrucciones = d.instructions ? `<br><br><em>${d.instructions}</em>` : '';
+
+    if (methodId === 'nequi' && d.nequi) infoHtml = `<strong>Número Nequi:</strong> ${d.nequi}${titular}${instrucciones}`;
+    else if (methodId === 'bancolombia' && d.bancolombia) infoHtml = `<strong>Cuenta Bancolombia:</strong> ${d.bancolombia}${titular}${instrucciones}`;
+    else if (methodId === 'daviplata' && d.daviplata) infoHtml = `<strong>Número DaviPlata:</strong> ${d.daviplata}${titular}${instrucciones}`;
+    else if (methodId === 'llave' && d.llave) infoHtml = `<strong>Número Llave:</strong> ${d.llave}${titular}${instrucciones}`;
+    else if (methodId === 'mercadopago' && d.mercadopagoLink) infoHtml = `<strong>Mercado Pago:</strong> <a href="${d.mercadopagoLink}" target="_blank" style="color:var(--sand)">${d.mercadopagoLink}</a>${instrucciones}`;
+    else if (methodId === 'payu' && d.payuLink) infoHtml = `<strong>PayU:</strong> <a href="${d.payuLink}" target="_blank" style="color:var(--sand)">${d.payuLink}</a>${instrucciones}`;
+    else if (methodId === 'efectivo') infoHtml = `Pago en efectivo al momento de la entrega.${instrucciones}`;
+    else if (instrucciones) infoHtml = instrucciones.trim();
+
+    if (infoHtml) {
+      infoBox.innerHTML = infoHtml;
+      infoBox.className = 'pay-info-box visible';
+    } else {
+      infoBox.className = 'pay-info-box';
+    }
+  };
+
+  window.backToStep1 = () => {
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step1').classList.add('active');
+  };
+
+  window.confirmOrder = async () => {
+    const metodoPago = document.querySelector('input[name="payMethod"]:checked')?.value;
+    if (!metodoPago) { alert('Por favor selecciona un método de pago'); return; }
+
+    const nombre = document.getElementById('coNombre').value.trim();
+    const wa = document.getElementById('coWa').value.trim();
+    const ciudad = document.getElementById('coCiudad').value.trim();
+    const direccion = document.getElementById('coDireccion').value.trim();
+
+    const subtotal = cart.reduce((s, i) => s + i.precio * i.qty, 0);
+    let discount = 0;
+    if (appliedCoupon) {
+      discount = appliedCoupon.tipo === 'percent'
+        ? Math.round(subtotal * (appliedCoupon.valor / 100))
+        : Math.min(appliedCoupon.valor, subtotal);
+    }
+    const total = subtotal - discount;
+
+    try {
+      await push(ref(db, 'pedidos'), {
+        cliente: nombre,
+        whatsapp: wa,
+        ciudad,
+        direccion,
+        productos: cart.map(i => ({
+          nombre: i.nombre,
+          qty: i.qty,
+          price: i.precio,
+          talla: i.selectedSize || null,
+          color: i.selectedColor || null
+        })),
+        total,
+        descuento: discount,
+        cupon: appliedCoupon?.codigo || null,
+        metodoPago,
+        estado: 'pendiente',
+        fecha: Date.now()
+      });
+    } catch(e) { console.error(e); }
+
+    // WhatsApp message
+    const waNum = (storeConfig.whatsapp || '573001234567').replace(/\D/g,'');
+    const methodName = getMergedPayMethods().find(m => m.id === metodoPago)?.name || metodoPago;
+    const msg = encodeURIComponent(
+      `¡Hola! Quiero hacer un pedido en Oleaje Store 🛍️\n\n` +
+      cart.map(i => `• ${i.nombre}${i.selectedSize?' ('+i.selectedSize+')':''}${i.selectedColor?' – color: '+i.selectedColor:''} ×${i.qty} = ${fmt(i.precio * i.qty)}`).join('\n') +
+      (discount ? `\n— Cupón ${appliedCoupon.codigo}: −${fmt(discount)}` : '') +
+      `\n\n*Total: ${fmt(total)}*\n` +
+      `*Método de pago:* ${methodName}\n` +
+      `Nombre: ${nombre}\n` +
+      (ciudad ? `Ciudad: ${ciudad}\n` : '') +
+      (direccion ? `Dirección: ${direccion}` : '')
+    );
+    window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
+
+    // Show confirmation
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step3').classList.add('active');
+
+    cart = [];
+    updateCartBadge();
+  };
+
+  // ── HERO SLIDER ──
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  window.goSlide = (n) => {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+    currentSlide = n;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  };
+  setInterval(() => goSlide((currentSlide + 1) % slides.length), 5000);
+
+  // ── POPUP ──
+  setTimeout(() => {
+    const p = document.getElementById('popupNotif');
+    setTimeout(() => { if (p) p.style.display = 'none'; }, 7000);
+  }, 2000);
+
+  // ── NAV ACTIVE ──
+  window.addEventListener('scroll', () => {
+    const sections = ['inicio', 'coleccion', 'nosotros', 'tallas'];
+    let cur = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY >= el.offsetTop - 100) cur = id;
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+    });
+  });
+</script>
+</body>
+</html>

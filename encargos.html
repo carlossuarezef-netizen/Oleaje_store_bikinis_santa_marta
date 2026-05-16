@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compras Bajo Encargo – Oleaje Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Tesseract.js OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    // ─── CONFIGURA TU FIREBASE AQUÍ ───────────────────────────────────────────
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_AUTH_DOMAIN",
+      databaseURL: "TU_DATABASE_URL",
+      projectId: "TU_PROJECT_ID",
+      storageBucket: "TU_STORAGE_BUCKET",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    const storage = getStorage(app);
+
+    // ── Leer configuración de encargos desde Firebase (admin puede cambiarla)
+    async function loadEncargosConfig() {
+      try {
+        const snap = await get(ref(db, 'config/encargos'));
+        if (snap.exists()) {
+          const c = snap.val();
+          window.ENCARGOS_CFG = {
+            multiplicador: c.multiplicador ?? 1.8,
+            envio:         c.envio         ?? 8000,
+            domicilio:     c.domicilio      ?? 0,
+            whatsapp:      c.whatsapp       ?? '573001234567',
+            moneda:        c.moneda         ?? 'COP'
+          };
+        }
+      } catch(e) { console.warn('Config Firebase no disponible, usando defaults'); }
+      renderCostsPreview();
+    }
+    loadEncargosConfig();
+
+    // ── Guardar encargo en Firebase y subir imagen
+    window.guardarEncargo = async (encargo, imageFile) => {
+      let imageUrl = null;
+      if (imageFile) {
+        try {
+          const storageRef = sRef(storage, `encargos/${Date.now()}_${imageFile.name}`);
+          await uploadBytes(storageRef, imageFile);
+          imageUrl = await getDownloadURL(storageRef);
+        } catch(e) { console.warn('No se pudo subir imagen:', e); }
+      }
+      const data = { ...encargo, imageUrl, estado: 'pendiente', fecha: Date.now() };
+      await push(ref(db, 'encargos'), data);
+      return data;
+    };
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sand: #c8a96e;
+      --sand-light: #dfc090;
+      --sand-pale: rgba(200,169,110,0.12);
+      --cream: #f5f0e8;
+      --dark: #1a1510;
+      --dark-mid: #2d2419;
+      --text: #3a2e22;
+      --white: #ffffff;
+      --gray: #8a7a6a;
+      --border: rgba(58,46,34,0.12);
+      --teal: #2a7a6e;
+      --teal-light: rgba(42,122,110,0.1);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+    /* ───── NAVBAR ───── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.97); backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(200,169,110,0.18);
+      height: 70px; display: flex; align-items: center;
+      padding: 0 40px; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif; font-size: 22px;
+      font-weight: 300; letter-spacing: 0.25em; color: var(--dark);
+      text-decoration: none; text-transform: uppercase;
+      display: flex; flex-direction: column; line-height: 1;
+    }
+    .nav-logo span { font-size: 9px; letter-spacing: 0.45em; font-family: 'Montserrat', sans-serif; font-weight: 400; color: var(--gray); margin-top: 3px; }
+    .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); transition: color 0.2s; }
+    .nav-back:hover { color: var(--sand); }
+    .nav-back svg { transition: transform 0.2s; }
+    .nav-back:hover svg { transform: translateX(-3px); }
+
+    /* ───── HERO BANNER ───── */
+    .encargos-hero {
+      background: linear-gradient(135deg, var(--dark) 0%, var(--dark-mid) 50%, #3a2e22 100%);
+      padding: 72px 40px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .encargos-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(200,169,110,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 75% 20%, rgba(200,169,110,0.05) 0%, transparent 40%);
+    }
+    .hero-eyebrow {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.45em;
+      color: var(--sand); text-transform: uppercase; margin-bottom: 18px;
+      position: relative;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(38px, 5vw, 64px);
+      font-weight: 300; line-height: 1.1;
+      color: var(--white); margin-bottom: 18px;
+      letter-spacing: 0.06em; position: relative;
+    }
+    .hero-subtitle {
+      font-size: 13px; color: rgba(255,255,255,0.65);
+      max-width: 540px; margin: 0 auto 36px;
+      line-height: 1.75; font-weight: 300; position: relative;
+    }
+    .platform-badges { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; position: relative; }
+    .platform-badge {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(200,169,110,0.25);
+      border-radius: 2px; padding: 10px 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cream);
+    }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .badge-dot.temu { background: #ff6900; }
+    .badge-dot.shein { background: #ff6b81; }
+
+    /* ───── HOW IT WORKS ───── */
+    .how-it-works { background: var(--white); padding: 52px 40px; }
+    .section-header { text-align: center; margin-bottom: 42px; }
+    .section-label { font-size: 9px; font-weight: 600; letter-spacing: 0.4em; text-transform: uppercase; color: var(--sand); margin-bottom: 10px; }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px, 3.5vw, 38px); font-weight: 300; color: var(--dark); letter-spacing: 0.1em; }
+    .section-line { width: 40px; height: 1px; background: var(--sand); margin: 14px auto 0; }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 900px; margin: 0 auto; }
+    .step-item { text-align: center; padding: 28px 24px; position: relative; }
+    .step-item::after { content: '→'; position: absolute; right: -4px; top: 36px; font-size: 18px; color: rgba(200,169,110,0.4); }
+    .step-item:last-child::after { display: none; }
+    .step-num { width: 46px; height: 46px; border-radius: 50%; background: var(--sand); color: var(--dark); font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-family: 'Cormorant Garamond', serif; }
+    .step-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dark); margin-bottom: 7px; }
+    .step-desc { font-size: 11px; color: var(--gray); line-height: 1.6; font-weight: 300; }
+
+    /* ───── MAIN FORM AREA ───── */
+    .main-area { padding: 60px 40px; max-width: 820px; margin: 0 auto; }
+
+    /* ── Method Toggle ── */
+    .method-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 36px; }
+    .method-btn {
+      border: 1.5px solid var(--border);
+      border-radius: 2px; padding: 20px;
+      cursor: pointer; transition: all 0.25s;
+      background: var(--white); text-align: left;
+      position: relative; display: flex; align-items: flex-start; gap: 14px;
+    }
+    .method-btn:hover { border-color: var(--sand); }
+    .method-btn.active { border-color: var(--sand); background: rgba(200,169,110,0.05); }
+    .method-btn.active::after { content: '✓'; position: absolute; top: 10px; right: 12px; font-size: 11px; font-weight: 700; color: var(--sand); }
+    .method-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .method-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dark); margin-bottom: 4px; }
+    .method-desc { font-size: 11px; color: var(--gray); line-height: 1.5; font-weight: 300; }
+
+    /* ── Panels ── */
+    .input-panel { display: none; animation: fadeUp 0.3s ease; }
+    .input-panel.visible { display: block; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Form Inputs ── */
+    .form-group { margin-bottom: 22px; }
+    .form-label { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dark); margin-bottom: 8px; }
+    .form-label .required { color: var(--sand); margin-left: 3px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: var(--white);
+      border: 1.5px solid var(--border); border-radius: 2px;
+      padding: 13px 16px; font-size: 13px; font-family: 'Montserrat', sans-serif;
+      color: var(--text); outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--sand); }
+    .form-textarea { resize: vertical; min-height: 90px; }
+    .form-hint { font-size: 10px; color: var(--gray); margin-top: 6px; letter-spacing: 0.03em; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    /* ── URL Input with platform detect ── */
+    .url-wrapper { position: relative; }
+    .url-input-wrap { position: relative; }
+    .url-platform-tag {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 100px;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .url-platform-tag.temu { background: rgba(255,105,0,0.12); color: #ff6900; opacity: 1; }
+    .url-platform-tag.shein { background: rgba(255,107,129,0.12); color: #ff6b81; opacity: 1; }
+
+    /* ── Image Dropzone ── */
+    .dropzone {
+      border: 2px dashed rgba(200,169,110,0.4);
+      border-radius: 2px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: rgba(200,169,110,0.03);
+      position: relative;
+    }
+    .dropzone:hover, .dropzone.dragover { border-color: var(--sand); background: rgba(200,169,110,0.07); }
+    .dropzone-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+    .dropzone-title { font-size: 13px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+    .dropzone-sub { font-size: 11px; color: var(--gray); }
+    .dropzone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .dropzone-preview { display: none; }
+    .dropzone-preview.visible { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 2px; border: 1px solid var(--border); }
+    .preview-info { flex: 1; min-width: 150px; }
+    .preview-name { font-size: 12px; font-weight: 600; color: var(--dark); margin-bottom: 4px; word-break: break-word; }
+    .preview-size { font-size: 11px; color: var(--gray); }
+    .preview-remove { font-size: 11px; color: var(--danger, #9b2335); cursor: pointer; margin-top: 8px; display: inline-block; text-decoration: underline; }
+
+    /* ── OCR Processing ── */
+    .ocr-status {
+      display: none; margin-top: 16px;
+      background: rgba(200,169,110,0.07);
+      border: 1px solid rgba(200,169,110,0.25);
+      border-radius: 2px; padding: 16px 20px;
+    }
+    .ocr-status.visible { display: flex; align-items: center; gap: 12px; }
+    .ocr-spinner {
+      width: 20px; height: 20px; border: 2px solid rgba(200,169,110,0.3);
+      border-top-color: var(--sand); border-radius: 50%;
+      animation: spin 0.8s linear infinite; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .ocr-text { font-size: 12px; color: var(--dark); font-weight: 500; }
+    .ocr-progress { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+    /* ── Price Detected ── */
+    .price-detected-box {
+      display: none; margin-top: 18px;
+      border: 1.5px solid var(--sand);
+      border-radius: 2px; padding: 20px 24px;
+      background: rgba(200,169,110,0.05);
+    }
+    .price-detected-box.visible { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .price-detected-label { font-size: 9px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gray); margin-bottom: 4px; }
+    .price-detected-val { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; color: var(--dark); }
+    .price-detected-currency { font-size: 13px; color: var(--gray); margin-left: 4px; }
+    .price-edit-btn { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sand); cursor: pointer; text-decoration: underline; }
+    .price-manual-row { margin-top: 14px; display: none; }
+    .price-manual-row.visible { display: block; }
+
+    /* ── Price Not Found Warning ── */
+    .price-warn {
+      display: none; margin-top: 12px;
+      background: rgba(184,114,10,0.08);
+      border: 1px solid rgba(184,114,10,0.3);
+      border-radius: 2px; padding: 12px 16px;
+      font-size: 12px; color: #8a5500;
+    }
+    .price-warn.visible { display: block; }
+
+    /* ── Calculation Card ── */
+    .calc-card {
+      background: var(--dark);
+      border-radius: 2px; padding: 28px 28px 24px;
+      margin: 28px 0;
+      display: none;
+    }
+    .calc-card.visible { display: block; }
+    .calc-title { font-size: 9px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(200,169,110,0.6); margin-bottom: 20px; }
+    .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .calc-row:last-child { border-bottom: none; }
+    .calc-row-label { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 300; }
+    .calc-row-val { font-size: 12px; font-weight: 500; color: var(--cream); }
+    .calc-divider { border: none; border-top: 1px solid rgba(200,169,110,0.2); margin: 12px 0; }
+    .calc-total-row { display: flex; justify-content: space-between; align-items: center; padding-top: 4px; }
+    .calc-total-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand-light); }
+    .calc-total-val { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 400; color: var(--white); }
+
+    /* ── Customer Form ── */
+    .customer-section { margin-top: 10px; }
+    .section-divider { display: flex; align-items: center; gap: 14px; margin: 32px 0 24px; }
+    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .section-divider-text { font-size: 9px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%; background: var(--sand); color: var(--dark);
+      border: none; padding: 17px 32px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+      text-transform: uppercase; cursor: pointer;
+      transition: background 0.25s, transform 0.2s;
+      border-radius: 2px; margin-top: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .submit-btn:hover { background: var(--sand-light); transform: translateY(-1px); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .submit-btn .btn-spinner { width: 16px; height: 16px; border: 2px solid rgba(26,21,16,0.2); border-top-color: var(--dark); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+    .submit-btn.loading .btn-spinner { display: block; }
+    .submit-btn.loading .btn-text { opacity: 0.6; }
+
+    /* ── Cost Preview Bar ── */
+    .costs-bar {
+      background: rgba(200,169,110,0.07);
+      border: 1px solid rgba(200,169,110,0.2);
+      border-radius: 2px; padding: 14px 20px;
+      display: flex; gap: 20px; flex-wrap: wrap;
+      margin-bottom: 28px; align-items: center;
+    }
+    .cost-item { text-align: center; }
+    .cost-item-label { font-size: 8px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-bottom: 3px; }
+    .cost-item-val { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .cost-item-val.highlight { color: var(--sand); }
+
+    /* ── Success Screen ── */
+    .success-screen {
+      display: none; text-align: center; padding: 64px 40px;
+      animation: fadeUp 0.5s ease;
+    }
+    .success-screen.visible { display: block; }
+    .success-icon { font-size: 56px; margin-bottom: 18px; }
+    .success-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; color: var(--dark); margin-bottom: 14px; letter-spacing: 0.1em; }
+    .success-sub { font-size: 13px; color: var(--gray); line-height: 1.75; margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto; }
+    .success-summary {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 2px; padding: 24px 28px;
+      max-width: 420px; margin: 0 auto 30px; text-align: left;
+    }
+    .success-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 12px; border-bottom: 1px solid var(--border); }
+    .success-row:last-child { border-bottom: none; font-weight: 700; color: var(--dark); }
+    .success-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-secondary {
+      background: transparent; color: var(--dark);
+      border: 1.5px solid var(--border);
+      padding: 13px 28px; font-family: 'Montserrat', sans-serif;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+      text-transform: uppercase; cursor: pointer;
+      transition: border-color 0.2s, color 0.2s; border-radius: 2px;
+      text-decoration: none; display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--sand); color: var(--sand); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--dark); color: var(--cream);
+      padding: 12px 22px; border-radius: 2px;
+      font-size: 12px; font-weight: 500; letter-spacing: 0.04em;
+      transform: translateX(140%); transition: transform 0.35s ease;
+      max-width: 320px; line-height: 1.5;
+      border-left: 3px solid var(--sand);
+    }
+
+    /* ── Info Cards ── */
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
+    .info-card { background: var(--white); border: 1px solid var(--border); border-radius: 2px; padding: 20px 18px; }
+    .info-card-icon { font-size: 22px; margin-bottom: 10px; }
+    .info-card-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dark); margin-bottom: 5px; }
+    .info-card-text { font-size: 11px; color: var(--gray); line-height: 1.6; font-weight: 300; }
+
+    /* ── FAQ ── */
+    .faq-section { background: var(--white); padding: 52px 40px; }
+    .faq-list { max-width: 680px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 0; cursor: pointer; font-size: 13px;
+      font-weight: 600; color: var(--dark); user-select: none;
+    }
+    .faq-q::after { content: '+'; font-size: 20px; color: var(--sand); transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-item.open .faq-a { max-height: 200px; }
+    .faq-a p { padding: 0 0 16px; font-size: 12px; color: var(--gray); line-height: 1.75; font-weight: 300; }
+
+    /* ── Footer strip ── */
+    .footer-strip {
+      background: var(--dark); color: rgba(255,255,255,0.4);
+      text-align: center; padding: 22px 40px;
+      font-size: 10px; letter-spacing: 0.12em;
+    }
+    .footer-strip a { color: var(--sand); text-decoration: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .encargos-hero { padding: 52px 24px 44px; }
+      .how-it-works { padding: 40px 20px; }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .step-item::after { display: none; }
+      .main-area { padding: 40px 20px; }
+      .method-toggle { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+      .faq-section { padding: 40px 20px; }
+      .calc-card { padding: 20px; }
+      .price-detected-box { flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      .costs-bar { flex-direction: column; gap: 10px; }
+      .platform-badges { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    OLEAJE
+    <span>Store · Moda Playera</span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Volver a la tienda
+  </a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="encargos-hero">
+  <p class="hero-eyebrow">✦ Servicio Exclusivo</p>
+  <h1 class="hero-title">Compras<br>Bajo Encargo</h1>
+  <p class="hero-subtitle">¿Viste algo increíble en Temu o Shein? Nosotras lo compramos por ti y te lo enviamos directo. Sube la captura o pega el link — calculamos todo automáticamente.</p>
+  <div class="platform-badges">
+    <div class="platform-badge"><span class="badge-dot temu"></span>Temu</div>
+    <div class="platform-badge"><span class="badge-dot shein"></span>Shein</div>
+    <div class="platform-badge">🌊 Envío a toda Colombia</div>
+  </div>
+</section>
+
+<!-- ─── CÓMO FUNCIONA ─── -->
+<section class="how-it-works">
+  <div class="section-header">
+    <p class="section-label">Proceso simple</p>
+    <h2 class="section-title">¿Cómo funciona?</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="steps-grid">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-title">Encuentra</div>
+      <div class="step-desc">Busca el producto que quieres en Temu o Shein</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div class="step-title">Comparte</div>
+      <div class="step-desc">Pega el link o sube una captura del producto</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-title">Calculamos</div>
+      <div class="step-desc">Detectamos el precio automáticamente y calculamos tu total</div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div class="step-title">¡Lo recibes!</div>
+      <div class="step-desc">Confirmamos, compramos y te enviamos a tu puerta</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FORMULARIO PRINCIPAL ─── -->
+<div class="main-area">
+
+  <!-- Info cards -->
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-icon">🔍</div>
+      <div class="info-card-title">Detección IA</div>
+      <div class="info-card-text">Nuestra IA lee el precio directamente de tu captura de pantalla con OCR avanzado.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">🧮</div>
+      <div class="info-card-title">Cálculo automático</div>
+      <div class="info-card-text">El precio final incluye comisión de servicio, envío internacional y domicilio local.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">📦</div>
+      <div class="info-card-title">Seguimiento</div>
+      <div class="info-card-text">Te notificamos por WhatsApp en cada etapa: compra, envío y entrega.</div>
+    </div>
+  </div>
+
+  <!-- Costs Preview Bar -->
+  <div class="costs-bar" id="costsBar">
+    <div class="cost-item">
+      <div class="cost-item-label">Comisión servicio</div>
+      <div class="cost-item-val highlight" id="previewMult">×1.8</div>
+    </div>
+    <div class="cost-item">
+      <div class="cost-item-label">Envío internacional</div>
+      <div class="cost-item-val" id="previewEnvio">$8.000</div>
+    </div>
+    <div class="cost-item">
+      <div class="cost-item-label">Domicilio local</div>
+      <div class="cost-item-val" id="previewDomicilio">$0</div>
+    </div>
+    <div class="cost-item" style="margin-left:auto;">
+      <div class="cost-item-label">Tiempo estimado</div>
+      <div class="cost-item-val">15–25 días</div>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS (hidden until submit) ── -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🌊</div>
+    <h2 class="success-title">¡Encargo recibido!</h2>
+    <p class="success-sub">Tu pedido fue registrado y ya te enviamos los detalles por WhatsApp. En breve nos ponemos en contacto para confirmar.</p>
+    <div class="success-summary" id="successSummary"></div>
+    <div class="success-btns">
+      <a href="index.html" class="btn-secondary">Ver tienda</a>
+      <button class="submit-btn" style="width:auto;padding:13px 28px;" onclick="resetForm()">Nuevo encargo</button>
+    </div>
+  </div>
+
+  <!-- ── MAIN FORM (hidden on success) ── -->
+  <div id="mainForm">
+
+    <!-- Method Toggle -->
+    <div class="method-toggle">
+      <div class="method-btn active" id="btnLink" onclick="switchMethod('link')">
+        <div class="method-icon">🔗</div>
+        <div>
+          <div class="method-title">Pegar Link</div>
+          <div class="method-desc">Copia la URL del producto de Temu o Shein</div>
+        </div>
+      </div>
+      <div class="method-btn" id="btnCaptura" onclick="switchMethod('captura')">
+        <div class="method-icon">📸</div>
+        <div>
+          <div class="method-title">Subir Captura</div>
+          <div class="method-desc">Sube una foto/screenshot del producto con precio visible</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PANEL: LINK ── -->
+    <div class="input-panel visible" id="panelLink">
+      <div class="form-group">
+        <label class="form-label">Link del producto <span class="required">*</span></label>
+        <div class="url-input-wrap">
+          <input type="url" class="form-input" id="productUrl"
+            placeholder="https://www.temu.com/... o https://www.shein.com/..."
+            oninput="detectPlatform(this.value)" />
+          <span class="url-platform-tag" id="urlPlatformTag"></span>
+        </div>
+        <p class="form-hint">Pega la URL completa del producto. También puedes adjuntar una captura abajo.</p>
+      </div>
+
+      <!-- Optional image upload when using link -->
+      <div class="form-group">
+        <label class="form-label">Captura opcional (para detectar precio)</label>
+        <div class="dropzone" id="dropzoneLinkImg" ondragover="handleDragOver(event,'dropzoneLinkImg')" ondragleave="handleDragLeave('dropzoneLinkImg')" ondrop="handleDrop(event,'link-img')">
+          <input type="file" accept="image/*" id="linkImageInput" onchange="handleImageSelect(this,'link-img')" />
+          <div id="dropzoneLinkImgPlaceholder">
+            <span class="dropzone-icon">🖼️</span>
+            <div class="dropzone-title">Arrastra o haz clic para subir una captura</div>
+            <div class="dropzone-sub">PNG, JPG, WEBP — Máx 10MB</div>
+          </div>
+          <div class="dropzone-preview" id="previewLinkImg">
+            <img id="previewLinkImgEl" class="preview-img" src="" alt="" />
+            <div class="preview-info">
+              <div class="preview-name" id="previewLinkImgName"></div>
+              <div class="preview-size" id="previewLinkImgSize"></div>
+              <span class="preview-remove" onclick="removeImage('link-img')">✕ Eliminar</span>
+            </div>
+          </div>
+        </div>
+        <div class="ocr-status" id="ocrStatusLink">
+          <div class="ocr-spinner"></div>
+          <div><div class="ocr-text">Analizando imagen con OCR...</div><div class="ocr-progress" id="ocrProgressLink"></div></div>
+        </div>
+        <div class="price-warn" id="priceWarnLink">⚠️ No se detectó precio en la imagen. Por favor ingresa el precio manualmente abajo.</div>
+        <div class="price-detected-box" id="priceBoxLink">
+          <div>
+            <div class="price-detected-label">Precio detectado</div>
+            <div><span class="price-detected-val" id="priceValLink">$0</span><span class="price-detected-currency">COP</span></div>
+          </div>
+          <div>
+            <div class="price-detected-label">Origen</div>
+            <div style="font-size:12px;color:var(--gray);" id="priceSourceLink">—</div>
+            <span class="price-edit-btn" onclick="toggleManualPrice('link')">✎ Editar</span>
+          </div>
+        </div>
+        <div class="price-manual-row" id="manualPriceRowLink">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Precio del producto (COP) <span class="required">*</span></label>
+            <input type="number" class="form-input" id="manualPriceLink" placeholder="Ej: 37000" min="0" oninput="updateCalcFromManual('link')" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descripción / Nombre del producto</label>
+        <input type="text" class="form-input" id="linkProductName" placeholder="Ej: Bikini floral talla M color rojo" />
+      </div>
+    </div>
+
+    <!-- ── PANEL: CAPTURA ── -->
+    <div class="input-panel" id="panelCaptura">
+      <div class="form-group">
+        <label class="form-label">Captura de pantalla del producto <span class="required">*</span></label>
+        <div class="dropzone" id="dropzoneCaptura" ondragover="handleDragOver(event,'dropzoneCaptura')" ondragleave="handleDragLeave('dropzoneCaptura')" ondrop="handleDrop(event,'captura')">
+          <input type="file" accept="image/*" id="capturaImageInput" onchange="handleImageSelect(this,'captura')" />
+          <div id="dropzoneCapturaPlaceholder">
+            <span class="dropzone-icon">📲</span>
+            <div class="dropzone-title">Sube la captura del producto</div>
+            <div class="dropzone-sub">El precio debe verse claramente · PNG, JPG, WEBP · Máx 10MB</div>
+          </div>
+          <div class="dropzone-preview" id="previewCaptura">
+            <img id="previewCapturaEl" class="preview-img" src="" alt="" />
+            <div class="preview-info">
+              <div class="preview-name" id="previewCapturaName"></div>
+              <div class="preview-size" id="previewCapturaSize"></div>
+              <span class="preview-remove" onclick="removeImage('captura')">✕ Eliminar</span>
+            </div>
+          </div>
+        </div>
+        <div class="ocr-status" id="ocrStatusCaptura">
+          <div class="ocr-spinner"></div>
+          <div><div class="ocr-text">Analizando imagen con OCR...</div><div class="ocr-progress" id="ocrProgressCaptura"></div></div>
+        </div>
+        <div class="price-warn" id="priceWarnCaptura">⚠️ No se detectó precio automáticamente. Por favor ingresa el precio manualmente abajo.</div>
+        <div class="price-detected-box" id="priceBoxCaptura">
+          <div>
+            <div class="price-detected-label">Precio detectado</div>
+            <div><span class="price-detected-val" id="priceValCaptura">$0</span><span class="price-detected-currency">COP</span></div>
+          </div>
+          <div>
+            <div class="price-detected-label">Confianza OCR</div>
+            <div style="font-size:12px;color:var(--gray);" id="priceSourceCaptura">—</div>
+            <span class="price-edit-btn" onclick="toggleManualPrice('captura')">✎ Editar</span>
+          </div>
+        </div>
+        <div class="price-manual-row" id="manualPriceRowCaptura">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Precio del producto (COP) <span class="required">*</span></label>
+            <input type="number" class="form-input" id="manualPriceCaptura" placeholder="Ej: 37000" min="0" oninput="updateCalcFromManual('captura')" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción / Nombre del producto</label>
+        <input type="text" class="form-input" id="capturaProductName" placeholder="Ej: Conjunto de playa talla S color azul" />
+      </div>
+    </div>
+
+    <!-- ── CALCULATION CARD ── -->
+    <div class="calc-card" id="calcCard">
+      <div class="calc-title">✦ Resumen de precios</div>
+      <div class="calc-row">
+        <span class="calc-row-label">Precio del producto</span>
+        <span class="calc-row-val" id="calcPrecioBase">—</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-row-label">Comisión de servicio</span>
+        <span class="calc-row-val" id="calcComision">—</span>
+      </div>
+      <div class="calc-row">
+        <span class="calc-row-label">Envío internacional</span>
+        <span class="calc-row-val" id="calcEnvio">—</span>
+      </div>
+      <div class="calc-row" id="calcDomicilioRow">
+        <span class="calc-row-label">Domicilio local</span>
+        <span class="calc-row-val" id="calcDomicilio">—</span>
+      </div>
+      <hr class="calc-divider" />
+      <div class="calc-total-row">
+        <span class="calc-total-label">Total estimado</span>
+        <span class="calc-total-val" id="calcTotal">—</span>
+      </div>
+    </div>
+
+    <!-- ── CUSTOMER DATA ── -->
+    <div class="customer-section">
+      <div class="section-divider">
+        <div class="section-divider-line"></div>
+        <span class="section-divider-text">Tus datos de contacto</span>
+        <div class="section-divider-line"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre completo <span class="required">*</span></label>
+          <input type="text" class="form-input" id="clienteNombre" placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp <span class="required">*</span></label>
+          <input type="tel" class="form-input" id="clienteWa" placeholder="+57 300 000 0000" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ciudad <span class="required">*</span></label>
+          <input type="text" class="form-input" id="clienteCiudad" placeholder="Tu ciudad" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dirección de entrega</label>
+          <input type="text" class="form-input" id="clienteDireccion" placeholder="Calle / Barrio (opcional)" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observaciones adicionales</label>
+        <textarea class="form-textarea" id="clienteObs" placeholder="Color específico, talla, variante del producto, etc."></textarea>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button class="submit-btn" id="submitBtn" onclick="submitEncargo()">
+      <div class="btn-spinner"></div>
+      <span class="btn-text">🛒 Enviar encargo por WhatsApp</span>
+    </button>
+    <p class="form-hint" style="text-align:center;margin-top:12px;">Al confirmar recibirás un mensaje de WhatsApp con el resumen de tu pedido.</p>
+
+  </div><!-- /mainForm -->
+</div><!-- /main-area -->
+
+<!-- ─── FAQ ─── -->
+<section class="faq-section">
+  <div class="section-header">
+    <p class="section-label">Preguntas frecuentes</p>
+    <h2 class="section-title">Dudas comunes</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">¿Cuánto tiempo demora el envío?</div>
+      <div class="faq-a"><p>Normalmente entre 15 y 25 días hábiles desde la confirmación del pago. Temu y Shein tienen envíos que varían según el origen del producto.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">¿Cómo se detecta el precio automáticamente?</div>
+      <div class="faq-a"><p>Usamos OCR (reconocimiento óptico de caracteres) con Tesseract.js que analiza tu captura de pantalla buscando patrones de precio en pesos colombianos o dólares. Si no lo detecta, puedes ingresarlo manualmente.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">¿Cómo realizo el pago?</div>
+      <div class="faq-a"><p>Después de confirmar el encargo te contactamos por WhatsApp para coordinar el pago por Nequi, Daviplata o transferencia bancaria antes de realizar la compra.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">¿Qué pasa si el producto no está disponible?</div>
+      <div class="faq-a"><p>Te avisamos inmediatamente y puedes elegir otro producto similar o recibir el reembolso completo.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">¿Hay un monto mínimo o máximo de compra?</div>
+      <div class="faq-a"><p>No hay monto mínimo. Para pedidos mayores a $500.000 COP en producto te contactamos para coordinar los detalles especiales del envío.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<div class="footer-strip">
+  © 2025 Oleaje Store · <a href="index.html">Volver a la tienda</a>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  GLOBAL STATE
+// ══════════════════════════════════════════════════════════════
+window.ENCARGOS_CFG = {
+  multiplicador: 1.8,
+  envio:         8000,
+  domicilio:     0,
+  whatsapp:      '573001234567',
+  moneda:        'COP'
+};
+
+let currentMethod   = 'link';      // 'link' | 'captura'
+let detectedPrices  = { link: 0, captura: 0 };
+let imageFiles      = { 'link-img': null, captura: null };
+let ocrRunning      = false;
+
+// ── Helpers ──────────────────────────────────────────────────
+const fmt = n => '$' + Math.round(n).toLocaleString('es-CO');
+const el  = id => document.getElementById(id);
+
+function toast(msg) {
+  const t = el('toastEl');
+  t.textContent = msg;
+  t.style.transform = 'translateX(0)';
+  setTimeout(() => t.style.transform = 'translateX(140%)', 3800);
+}
+
+// ── Cost Preview ─────────────────────────────────────────────
+function renderCostsPreview() {
+  const cfg = window.ENCARGOS_CFG;
+  el('previewMult').textContent     = '×' + cfg.multiplicador;
+  el('previewEnvio').textContent    = fmt(cfg.envio);
+  el('previewDomicilio').textContent = fmt(cfg.domicilio);
+}
+
+// ── Method Switch ─────────────────────────────────────────────
+function switchMethod(m) {
+  currentMethod = m;
+  el('btnLink').classList.toggle('active', m === 'link');
+  el('btnCaptura').classList.toggle('active', m === 'captura');
+  el('panelLink').classList.toggle('visible', m === 'link');
+  el('panelCaptura').classList.toggle('visible', m === 'captura');
+  updateCalc();
+}
+
+// ── Platform Detection ───────────────────────────────────────
+function detectPlatform(url) {
+  const tag = el('urlPlatformTag');
+  tag.className = 'url-platform-tag';
+  if (!url) return;
+  if (url.includes('temu.com')) { tag.className = 'url-platform-tag temu'; tag.textContent = 'TEMU'; }
+  else if (url.includes('shein.com')) { tag.className = 'url-platform-tag shein'; tag.textContent = 'SHEIN'; }
+}
+
+// ── Image Handlers ───────────────────────────────────────────
+function handleDragOver(e, id) { e.preventDefault(); el(id).classList.add('dragover'); }
+function handleDragLeave(id) { el(id).classList.remove('dragover'); }
+function handleDrop(e, key) {
+  e.preventDefault();
+  const id = key === 'captura' ? 'dropzoneCaptura' : 'dropzoneLinkImg';
+  el(id).classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processImageFile(file, key);
+}
+function handleImageSelect(input, key) {
+  const file = input.files[0];
+  if (file) processImageFile(file, key);
+}
+
+function processImageFile(file, key) {
+  if (!file.type.startsWith('image/')) { toast('⚠️ Por favor sube solo imágenes'); return; }
+  if (file.size > 10 * 1024 * 1024) { toast('⚠️ La imagen es muy grande (máx 10MB)'); return; }
+
+  imageFiles[key] = file;
+  const isCaptura = key === 'captura';
+  const suffix    = isCaptura ? 'Captura' : 'LinkImg';
+  const ocrKey    = isCaptura ? 'captura' : 'link';
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = e => {
+    el('preview' + suffix + 'El').src  = e.target.result;
+    el('preview' + suffix + 'Name').textContent = file.name;
+    el('preview' + suffix + 'Size').textContent = (file.size / 1024).toFixed(1) + ' KB';
+    el('dropzone' + suffix + 'Placeholder') && (el('dropzone' + suffix + 'Placeholder').style.display = 'none');
+    el('preview' + suffix).classList.add('visible');
+  };
+  reader.readAsDataURL(file);
+
+  // Run OCR
+  runOCR(file, ocrKey);
+}
+
+function removeImage(key) {
+  imageFiles[key] = null;
+  const isCaptura = key === 'captura';
+  const suffix = isCaptura ? 'Captura' : 'LinkImg';
+  const ocrKey = isCaptura ? 'captura' : 'link';
+
+  el('preview' + suffix).classList.remove('visible');
+  const ph = el('dropzone' + suffix + 'Placeholder');
+  if (ph) ph.style.display = '';
+  const inp = isCaptura ? el('capturaImageInput') : el('linkImageInput');
+  inp.value = '';
+
+  detectedPrices[ocrKey] = 0;
+  el('priceBox' + (isCaptura ? 'Captura' : 'Link')).classList.remove('visible');
+  el('priceWarn' + (isCaptura ? 'Captura' : 'Link')).classList.remove('visible');
+  updateCalc();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  OCR ENGINE — Tesseract.js with smart price extraction
+// ══════════════════════════════════════════════════════════════
+async function runOCR(file, key) {
+  if (ocrRunning) return;
+  ocrRunning = true;
+
+  const statusId   = key === 'captura' ? 'ocrStatusCaptura' : 'ocrStatusLink';
+  const progressId = key === 'captura' ? 'ocrProgressCaptura' : 'ocrProgressLink';
+  const warnId     = key === 'captura' ? 'priceWarnCaptura' : 'priceWarnLink';
+  const boxId      = key === 'captura' ? 'priceBoxCaptura' : 'priceBoxLink';
+  const valId      = key === 'captura' ? 'priceValCaptura' : 'priceValLink';
+  const srcId      = key === 'captura' ? 'priceSourceCaptura' : 'priceSourceLink';
+
+  el(statusId).classList.add('visible');
+  el(warnId).classList.remove('visible');
+  el(boxId).classList.remove('visible');
+
+  try {
+    const worker = await Tesseract.createWorker('spa+eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          el(progressId).textContent = Math.round(m.progress * 100) + '%';
+        }
+      }
+    });
+
+    const { data: { text, confidence } } = await worker.recognize(file);
+    await worker.terminate();
+
+    const price = extractPrice(text);
+    el(statusId).classList.remove('visible');
+
+    if (price > 0) {
+      detectedPrices[key] = price;
+      el(valId).textContent = fmt(price);
+      el(srcId).textContent = `OCR ${Math.round(confidence)}% confianza`;
+      el(boxId).classList.add('visible');
+      toast(`✅ Precio detectado: ${fmt(price)}`);
+      updateCalc();
+    } else {
+      el(warnId).classList.add('visible');
+      el('manualPriceRow' + (key === 'captura' ? 'Captura' : 'Link')).classList.add('visible');
+      toast('⚠️ No se detectó precio. Ingrésalo manualmente.');
+    }
+  } catch (err) {
+    console.error('OCR error:', err);
+    el(statusId).classList.remove('visible');
+    el(warnId).classList.add('visible');
+    el('manualPriceRow' + (key === 'captura' ? 'Captura' : 'Link')).classList.add('visible');
+    toast('⚠️ Error en OCR. Por favor ingresa el precio manualmente.');
+  }
+  ocrRunning = false;
+}
+
+// ── Smart Price Extraction ────────────────────────────────────
+function extractPrice(text) {
+  // Normalizar: quitar saltos, múltiples espacios
+  const clean = text.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ');
+
+  // Patrones de precio en COP, USD, etc.
+  const patterns = [
+    // COP: $37.000 | $37,000 | COP 37.000 | 37.000 COP
+    /\$\s*([\d]{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?)/g,
+    /COP\s*([\d]{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?)/gi,
+    /([\d]{1,3}(?:[.,]\d{3})+(?:[.,]\d{1,2})?)\s*COP/gi,
+    // USD: $37.99 | USD 37.99 | 37.99 USD
+    /\$\s*(\d{1,4}(?:\.\d{1,2})?)/g,
+    /USD\s*(\d{1,4}(?:\.\d{1,2})?)/gi,
+    // Precio simple > 999 (probablemente precio COP sin formato)
+    /\b(\d{4,7})\b/g,
+  ];
+
+  let candidates = [];
+
+  for (const pat of patterns) {
+    let m;
+    pat.lastIndex = 0;
+    while ((m = pat.exec(clean)) !== null) {
+      const raw = m[1].replace(/\./g, '').replace(/,/g, '.');
+      const num = parseFloat(raw);
+      if (!isNaN(num) && num > 0) candidates.push(num);
+    }
+  }
+
+  if (!candidates.length) return 0;
+
+  // Filtrar valores razonables (entre $500 y $5,000,000 COP)
+  const reasonable = candidates.filter(n => n >= 500 && n <= 5000000);
+  if (!reasonable.length) return 0;
+
+  // Devolver el valor más frecuente o el mediano
+  const sorted = [...reasonable].sort((a, b) => a - b);
+  const mid = sorted[Math.floor(sorted.length / 2)];
+  return Math.round(mid);
+}
+
+// ── Manual Price ─────────────────────────────────────────────
+function toggleManualPrice(key) {
+  const rowId = 'manualPriceRow' + (key === 'captura' ? 'Captura' : 'Link');
+  el(rowId).classList.toggle('visible');
+}
+
+function updateCalcFromManual(key) {
+  const inputId = 'manualPrice' + (key === 'captura' ? 'Captura' : 'Link');
+  const val = parseFloat(el(inputId).value) || 0;
+  detectedPrices[key] = val;
+
+  // Update price box display
+  const boxId = 'priceBox' + (key === 'captura' ? 'Captura' : 'Link');
+  const valId = 'priceVal' + (key === 'captura' ? 'Captura' : 'Link');
+  const srcId = 'priceSource' + (key === 'captura' ? 'Captura' : 'Link');
+  if (val > 0) {
+    el(valId).textContent = fmt(val);
+    el(srcId).textContent = 'Ingresado manualmente';
+    el(boxId).classList.add('visible');
+  } else {
+    el(boxId).classList.remove('visible');
+  }
+  updateCalc();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PRICE CALCULATION
+// ══════════════════════════════════════════════════════════════
+function getActivePrice() {
+  return detectedPrices[currentMethod] || 0;
+}
+
+function updateCalc() {
+  const cfg   = window.ENCARGOS_CFG;
+  const base  = getActivePrice();
+  const card  = el('calcCard');
+
+  if (base <= 0) { card.classList.remove('visible'); return; }
+
+  const comision = Math.round(base * (cfg.multiplicador - 1));
+  const total    = Math.round(base * cfg.multiplicador) + cfg.envio + cfg.domicilio;
+
+  el('calcPrecioBase').textContent = fmt(base);
+  el('calcComision').textContent   = fmt(comision) + ' (' + Math.round((cfg.multiplicador - 1) * 100) + '%)';
+  el('calcEnvio').textContent      = fmt(cfg.envio);
+  el('calcDomicilio').textContent  = fmt(cfg.domicilio);
+  el('calcDomicilioRow').style.display = cfg.domicilio > 0 ? '' : 'none';
+  el('calcTotal').textContent      = fmt(total);
+  card.classList.add('visible');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SUBMIT ENCARGO
+// ══════════════════════════════════════════════════════════════
+async function submitEncargo() {
+  const btn   = el('submitBtn');
+  const cfg   = window.ENCARGOS_CFG;
+
+  // Validación
+  const nombre  = el('clienteNombre').value.trim();
+  const wa      = el('clienteWa').value.trim();
+  const ciudad  = el('clienteCiudad').value.trim();
+  const url     = currentMethod === 'link' ? el('productUrl').value.trim() : '';
+  const prodName = currentMethod === 'link' ? el('linkProductName').value.trim() : el('capturaProductName').value.trim();
+  const obs     = el('clienteObs').value.trim();
+  const base    = getActivePrice();
+
+  if (!nombre) { toast('⚠️ Ingresa tu nombre'); return; }
+  if (!wa)     { toast('⚠️ Ingresa tu número de WhatsApp'); return; }
+  if (!ciudad) { toast('⚠️ Ingresa tu ciudad'); return; }
+  if (currentMethod === 'link' && !url) { toast('⚠️ Pega el link del producto'); return; }
+  if (currentMethod === 'captura' && !imageFiles['captura']) { toast('⚠️ Sube una captura del producto'); return; }
+  if (base <= 0) { toast('⚠️ No se detectó el precio. Ingrésalo manualmente.'); return; }
+
+  const total    = Math.round(base * cfg.multiplicador) + cfg.envio + cfg.domicilio;
+  const comision = Math.round(base * (cfg.multiplicador - 1));
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  // ── WhatsApp primero (sin await intermedio) ─────────────────
+  const waNum = cfg.whatsapp.replace(/\D/g, '');
+  const platform = url.includes('temu.com') ? 'Temu' : url.includes('shein.com') ? 'Shein' : 'Temu/Shein';
+  const msgWa = encodeURIComponent(
+    `🛍️ *ENCARGO BAJO PEDIDO — Oleaje Store*\n\n` +
+    `📦 *Plataforma:* ${platform}\n` +
+    (url ? `🔗 *Link:* ${url}\n` : '') +
+    (prodName ? `📝 *Producto:* ${prodName}\n` : '') +
+    `\n💰 *Precio producto:* ${fmt(base)}\n` +
+    `   Comisión servicio: ${fmt(comision)}\n` +
+    `   Envío internacional: ${fmt(cfg.envio)}\n` +
+    (cfg.domicilio > 0 ? `   Domicilio local: ${fmt(cfg.domicilio)}\n` : '') +
+    `*💳 TOTAL: ${fmt(total)}*\n\n` +
+    `👤 *Cliente:* ${nombre}\n` +
+    `📱 *WhatsApp:* ${wa}\n` +
+    `📍 *Ciudad:* ${ciudad}\n` +
+    (obs ? `💬 *Notas:* ${obs}` : '')
+  );
+
+  const a = document.createElement('a');
+  a.href = `https://wa.me/${waNum}?text=${msgWa}`;
+  a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  // ── Guardar en Firebase ─────────────────────────────────────
+  const encargo = {
+    tipo: currentMethod, plataforma: platform,
+    url: url || null, nombreProducto: prodName || null,
+    precioBase: base, comision, envio: cfg.envio,
+    domicilio: cfg.domicilio, total,
+    cliente: nombre, whatsapp: wa, ciudad,
+    obs: obs || null
+  };
+
+  try {
+    const imageFile = imageFiles[currentMethod === 'link' ? 'link-img' : 'captura'];
+    if (window.guardarEncargo) await window.guardarEncargo(encargo, imageFile);
+  } catch(e) { console.warn('Firebase error (no bloqueante):', e); }
+
+  // ── Mostrar pantalla de éxito ───────────────────────────────
+  el('mainForm').style.display = 'none';
+  const summary = el('successSummary');
+  summary.innerHTML = `
+    <div class="success-row"><span>Producto</span><span>${prodName || platform}</span></div>
+    <div class="success-row"><span>Precio base</span><span>${fmt(base)}</span></div>
+    <div class="success-row"><span>Comisión</span><span>${fmt(comision)}</span></div>
+    <div class="success-row"><span>Envío</span><span>${fmt(cfg.envio)}</span></div>
+    ${cfg.domicilio > 0 ? `<div class="success-row"><span>Domicilio</span><span>${fmt(cfg.domicilio)}</span></div>` : ''}
+    <div class="success-row"><span>Total estimado</span><span>${fmt(total)}</span></div>
+  `;
+  el('successScreen').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  btn.classList.remove('loading');
+  btn.disabled = false;
+}
+
+function resetForm() {
+  el('mainForm').style.display = '';
+  el('successScreen').classList.remove('visible');
+  // Reset all inputs
+  ['productUrl','linkProductName','capturaProductName','clienteNombre',
+   'clienteWa','clienteCiudad','clienteDireccion','clienteObs',
+   'manualPriceLink','manualPriceCaptura'].forEach(id => {
+    const e = el(id); if(e) e.value = '';
+  });
+  detectedPrices = { link: 0, captura: 0 };
+  imageFiles = { 'link-img': null, captura: null };
+  ['priceBoxLink','priceBoxCaptura','calcCard',
+   'priceWarnLink','priceWarnCaptura',
+   'manualPriceRowLink','manualPriceRowCaptura'].forEach(id => {
+    const e = el(id); if(e) e.classList.remove('visible');
+  });
+  ['previewLinkImg','previewCaptura'].forEach(id => {
+    const e = el(id); if(e) e.classList.remove('visible');
+  });
+  el('urlPlatformTag').className = 'url-platform-tag';
+  switchMethod('link');
+}
+
+// ── FAQ ──────────────────────────────────────────────────────
+function toggleFaq(el) {
+  el.parentElement.classList.toggle('open');
+}
+</script>
+</body>
+</html>

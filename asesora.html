@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
+<title>Oleaje · Punto de Venta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sand:#c8a96e;
+  --sand-light:#dfc090;
+  --sand-pale:rgba(200,169,110,0.12);
+  --cream:#f5f0e8;
+  --cream-dark:#ede6d8;
+  --dark:#1a1510;
+  --dark-mid:#2d2419;
+  --text:#3a2e22;
+  --gray:#8a7a6a;
+  --gray-mid:#bfb4a6;
+  --border:rgba(58,46,34,0.12);
+  --border-strong:rgba(200,169,110,0.35);
+  --success:#4a7c59;
+  --warning:#b8720a;
+  --danger:#9b2335;
+  --success-bg:rgba(74,124,89,0.1);
+  --danger-bg:rgba(155,35,53,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased;}
+button{cursor:pointer;font-family:'Montserrat',sans-serif;}
+input{font-family:'Montserrat',sans-serif;}
+
+/* ── PANTALLA DE PIN ── */
+#lockScreen{position:fixed;inset:0;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:1000;}
+.lock-logo h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;letter-spacing:0.35em;color:var(--cream);text-transform:uppercase;text-align:center;}
+.lock-logo p{font-size:10px;letter-spacing:0.4em;color:var(--sand);margin-top:8px;text-transform:uppercase;font-weight:500;text-align:center;}
+.lock-divider{width:44px;height:1px;background:var(--sand);margin:28px auto 32px;opacity:0.5;}
+.lock-box{width:100%;max-width:300px;padding:0 24px;}
+.pin-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(200,169,110,0.25);border-radius:3px;padding:16px;font-size:22px;letter-spacing:0.4em;color:var(--cream);outline:none;text-align:center;transition:border-color 0.2s;}
+.pin-input:focus{border-color:var(--sand);}
+.pin-btn{width:100%;background:var(--sand);color:var(--dark);padding:15px;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;border:none;border-radius:3px;margin-top:14px;transition:background 0.2s;}
+.pin-btn:hover{background:var(--sand-light);}
+.pin-error{color:#e08a8a;font-size:11px;text-align:center;margin-top:14px;display:none;letter-spacing:0.02em;}
+
+/* ── APP PRINCIPAL ── */
+#app{display:none;min-height:100vh;flex-direction:column;}
+.pos-header{background:var(--dark);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.pos-brand h1{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;color:var(--cream);letter-spacing:0.3em;text-transform:uppercase;}
+.pos-brand p{font-size:9px;letter-spacing:0.3em;color:var(--sand);margin-top:3px;text-transform:uppercase;}
+.pos-header-right{display:flex;align-items:center;gap:14px;}
+.pos-date{font-size:10px;color:var(--gray-mid);text-align:right;letter-spacing:0.03em;text-transform:capitalize;}
+.pos-logout{background:none;border:1px solid rgba(200,169,110,0.3);color:var(--sand-light);padding:8px 14px;border-radius:2px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;}
+.pos-logout:hover{border-color:var(--sand);color:var(--cream);}
+
+/* ── TABS ── */
+.tab-bar{display:flex;background:var(--dark-mid);padding:0 24px;position:sticky;top:57px;z-index:45;overflow-x:auto;}
+.tab-btn{background:none;border:none;color:var(--gray-mid);padding:13px 16px;font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.15s;}
+.tab-btn:hover{color:var(--cream);}
+.tab-btn.active{color:var(--sand-light);border-color:var(--sand);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.pos-search-wrap{padding:18px 24px 6px;background:var(--cream);}
+.pos-search{width:100%;background:#fff;border:1px solid var(--border);border-radius:3px;padding:14px 18px;font-size:14px;color:var(--text);outline:none;transition:border-color 0.2s;}
+.pos-search:focus{border-color:var(--sand);}
+.pos-search::placeholder{color:var(--gray-mid);}
+
+.pos-body{flex:1;padding:14px 24px 50px;}
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;}
+
+.prod-card{background:#fff;border:1px solid var(--border);border-radius:4px;padding:18px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;gap:8px;}
+.prod-card:hover{border-color:var(--sand);box-shadow:0 4px 16px rgba(58,46,34,0.08);transform:translateY(-2px);}
+.prod-card .prod-emoji{font-size:30px;margin-bottom:2px;}
+.prod-card .prod-nombre{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--dark);line-height:1.3;}
+.prod-card .prod-meta{font-size:11px;color:var(--gray);letter-spacing:0.02em;}
+.prod-card .prod-precio{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--sand);margin-top:4px;}
+.prod-stock{display:inline-block;width:fit-content;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:2px;}
+.prod-stock.ok{background:var(--success-bg);color:var(--success);}
+.prod-stock.low{background:rgba(184,114,10,0.1);color:var(--warning);}
+.prod-stock.out{background:var(--danger-bg);color:var(--danger);}
+
+.empty-state{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--gray);}
+.empty-state .icon{font-size:38px;margin-bottom:14px;opacity:0.5;}
+
+/* ── STAT CARDS (Ventas de Hoy) ── */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+.stat-box{background:#fff;border:1px solid var(--border);border-top:3px solid var(--sand);border-radius:4px;padding:18px 20px;}
+.stat-box .lbl{font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray);font-weight:700;}
+.stat-box .val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--dark);margin-top:4px;}
+.stat-box.success{border-top-color:var(--success);}
+.stat-box.success .val{color:var(--success);}
+
+/* ── TABLAS (Ventas de Hoy / Inventario) ── */
+.pos-table-wrap{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+table.pos-table{width:100%;border-collapse:collapse;}
+table.pos-table th{text-align:left;font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray);font-weight:700;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--cream-dark);white-space:nowrap;}
+table.pos-table td{padding:12px 16px;font-size:12.5px;border-bottom:1px solid var(--border);color:var(--text);white-space:nowrap;}
+table.pos-table tr:last-child td{border-bottom:none;}
+.badge-stock{display:inline-block;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;padding:3px 9px;border-radius:100px;}
+
+/* ── MODAL DE VENTA ── */
+.pos-modal-overlay{position:fixed;inset:0;background:rgba(26,21,16,0.55);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.pos-modal-overlay.open{display:flex;}
+.pos-modal{background:#fff;border-radius:6px;width:100%;max-width:380px;padding:32px;text-align:center;animation:modalIn 0.2s ease;}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.pos-modal .m-emoji{font-size:42px;margin-bottom:10px;}
+.pos-modal .m-nombre{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--dark);}
+.pos-modal .m-meta{font-size:12px;color:var(--gray);margin-top:6px;letter-spacing:0.02em;}
+.pos-modal .m-precio{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:var(--sand);margin:18px 0 22px;}
+.qty-wrap{display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:24px;}
+.qty-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border-strong);background:var(--sand-pale);color:var(--dark);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{background:var(--sand);color:#fff;}
+.qty-val{font-size:20px;font-weight:700;min-width:30px;}
+.m-total{font-size:12px;color:var(--gray);margin-bottom:20px;}
+.m-total strong{color:var(--text);font-size:16px;}
+.btn-confirm{width:100%;background:var(--success);color:#fff;padding:15px;border:none;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;transition:background 0.2s;}
+.btn-confirm:hover{background:#3d6849;}
+.btn-confirm:disabled{background:var(--gray-mid);cursor:not-allowed;}
+.btn-cancel{width:100%;background:none;border:none;color:var(--gray);padding:12px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;margin-top:6px;}
+.btn-cancel:hover{color:var(--text);}
+
+/* ── TOAST ── */
+#toastEl{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:var(--cream);padding:14px 26px;border-radius:4px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:all 0.3s;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,0.25);border:1px solid rgba(200,169,110,0.25);max-width:90vw;text-align:center;}
+#toastEl.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:480px){
+  .pos-header,.pos-search-wrap,.pos-body,.tab-bar{padding-left:16px;padding-right:16px;}
+  .pos-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .prod-card{padding:14px;}
+  .pos-date{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- PANTALLA DE ACCESO -->
+<div id="lockScreen">
+  <div class="lock-logo">
+    <h1>Oleaje</h1>
+    <p>Punto de Venta</p>
+  </div>
+  <div class="lock-divider"></div>
+  <div class="lock-box">
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" placeholder="• • • •" maxlength="8"/>
+    <button class="pin-btn" onclick="tryUnlock()">Ingresar</button>
+    <p class="pin-error" id="pinError">PIN incorrecto. Intenta de nuevo.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="pos-header">
+    <div class="pos-brand">
+      <h1>Oleaje</h1>
+      <p>Punto de Venta</p>
+    </div>
+    <div class="pos-header-right">
+      <div class="pos-date" id="posDate"></div>
+      <button class="pos-logout" onclick="lockApp()">Salir</button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabBtnVender" onclick="switchTab('vender')">🛍️ Vender</button>
+    <button class="tab-btn" id="tabBtnHoy" onclick="switchTab('hoy')">📊 Ventas de Hoy</button>
+    <button class="tab-btn" id="tabBtnInv" onclick="switchTab('inv')">📦 Inventario</button>
+  </div>
+
+  <!-- TAB: VENDER -->
+  <div class="tab-content active" id="tabVender">
+    <div class="pos-search-wrap">
+      <input class="pos-search" id="searchInput" type="text" placeholder="🔍 Buscar por nombre o código..." oninput="renderCatalogo()"/>
+    </div>
+    <div class="pos-body">
+      <div class="pos-grid" id="catalogGrid">
+        <div class="empty-state"><div class="icon">⏳</div><p>Cargando catálogo...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: VENTAS DE HOY -->
+  <div class="tab-content" id="tabHoy">
+    <div class="pos-body">
+      <div class="stat-row">
+        <div class="stat-box success">
+          <p class="lbl">Vendido Hoy</p>
+          <p class="val" id="hoyTotal">$0</p>
+        </div>
+        <div class="stat-box">
+          <p class="lbl">Ventas Realizadas</p>
+          <p class="val" id="hoyCantidad">0</p>
+        </div>
+        <div class="stat-box">
+          <p class="lbl">Unidades Vendidas</p>
+          <p class="val" id="hoyUnidades">0</p>
+        </div>
+      </div>
+      <div class="pos-table-wrap">
+        <table class="pos-table">
+          <thead><tr><th>Hora</th><th>Producto</th><th>Talla / Color</th><th>Cant.</th><th>Precio</th><th>Total</th></tr></thead>
+          <tbody id="hoyBody"><tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray)">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: INVENTARIO -->
+  <div class="tab-content" id="tabInv">
+    <div class="pos-search-wrap">
+      <input class="pos-search" id="invSearchInput" type="text" placeholder="🔍 Buscar producto para contar..." oninput="renderInventarioTab()"/>
+    </div>
+    <div class="pos-body">
+      <p style="font-size:11px;color:var(--gray);margin-bottom:14px;line-height:1.6">Usa esta lista para contar lo que queda físicamente en la tienda al cerrar, y comparar contra lo que dice el sistema.</p>
+      <div class="pos-table-wrap">
+        <table class="pos-table">
+          <thead><tr><th>Código</th><th>Producto</th><th>Talla / Color</th><th>Categoría</th><th>Stock Sistema</th></tr></thead>
+          <tbody id="invBody"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray)">Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE VENTA -->
+<div class="pos-modal-overlay" id="modalOverlay">
+  <div class="pos-modal">
+    <div class="m-emoji" id="mEmoji">👗</div>
+    <div class="m-nombre" id="mNombre">Producto</div>
+    <div class="m-meta" id="mMeta">Talla · Color</div>
+    <div class="m-precio" id="mPrecio">$0</div>
+    <div class="qty-wrap">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <span class="qty-val" id="qtyVal">1</span>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+    <div class="m-total">Total a cobrar: <strong id="mTotal">$0</strong></div>
+    <button class="btn-confirm" id="btnConfirm" onclick="confirmarVenta()">✅ Registrar Venta</button>
+    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<div id="toastEl"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+import { getDatabase, ref, onValue, push, set, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+const firebaseConfig = {apiKey:"AIzaSyCoBp2d5M2OcClIatLA4RqZx7vhCURqKdQ",authDomain:"oleaje-store.firebaseapp.com",projectId:"oleaje-store",storageBucket:"oleaje-store.firebasestorage.app",messagingSenderId:"253321516324",appId:"1:253321516324:web:92696cce481b5189e8fb1",databaseURL:"https://oleaje-store-default-rtdb.firebaseio.com"};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let catalogo = {};       // catalogoVentas (público: sin costo)
+let ventasLog = {};      // ventasFisicas (público: sin costo, solo para ver lo vendido)
+let asesoraPin = '';
+let productoActivo = null; // {key, ...}
+let qty = 1;
+
+// Emojis por categoría (decorativo, sin necesidad de imágenes)
+const EMOJI_MAP = {
+  'vestido de baño':'👙','vestidos de baño':'👙','bikini':'👙',
+  'vestido':'👗','vestidos':'👗',
+  'camisa':'👕','camisas':'👕','blusa':'👚','blusas':'👚',
+  'pantalon':'👖','pantalón':'👖','short':'🩳','shorts':'🩳',
+  'zapato':'👠','zapatos':'👠','sandalia':'👡','sandalias':'👡',
+  'accesorio':'💍','accesorios':'💍','bolso':'👜','bolsos':'👜',
+};
+function emojiFor(categoria){
+  const c = (categoria||'').toLowerCase().trim();
+  return EMOJI_MAP[c] || '🛍️';
+}
+function fmtCOP(n){ return '$' + Math.round(n||0).toLocaleString('es-CO'); }
+function hoyStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function toast(msg){
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2600);
+}
+
+document.getElementById('posDate').textContent = new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+
+// ── TABS ──
+window.switchTab = (tab) => {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab'+({vender:'Vender',hoy:'Hoy',inv:'Inv'})[tab]).classList.add('active');
+  document.getElementById('tabBtn'+({vender:'Vender',hoy:'Hoy',inv:'Inv'})[tab]).classList.add('active');
+  if(tab==='hoy') renderVentasHoy();
+  if(tab==='inv') renderInventarioTab();
+};
+
+// ── PIN ──
+onValue(ref(db,'config/asesoraPin'), snap => {
+  asesoraPin = snap.exists() ? String(snap.val()) : '';
+}, err => toast('❌ No se pudo leer el PIN: '+err.message));
+
+window.tryUnlock = () => {
+  const val = document.getElementById('pinInput').value.trim();
+  const err = document.getElementById('pinError');
+  if(!asesoraPin){ err.textContent='Aún no se ha configurado un PIN. Pide al administrador que lo cree en el panel.'; err.style.display='block'; return; }
+  if(val === asesoraPin){
+    document.getElementById('lockScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    err.style.display='none';
+  } else {
+    err.textContent='PIN incorrecto. Intenta de nuevo.';
+    err.style.display='block';
+    document.getElementById('pinInput').value='';
+  }
+};
+document.getElementById('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') window.tryUnlock(); });
+
+window.lockApp = () => {
+  document.getElementById('app').style.display='none';
+  document.getElementById('lockScreen').style.display='flex';
+  document.getElementById('pinInput').value='';
+};
+
+// ── CATÁLOGO (fuente de datos en vivo) ──
+onValue(ref(db,'catalogoVentas'), snap => {
+  catalogo = snap.exists() ? snap.val() : {};
+  renderCatalogo();
+  if(document.getElementById('tabInv').classList.contains('active')) renderInventarioTab();
+}, err => toast('❌ No se pudo cargar el catálogo (permisos): '+err.message));
+
+onValue(ref(db,'ventasFisicas'), snap => {
+  ventasLog = snap.exists() ? snap.val() : {};
+  if(document.getElementById('tabHoy').classList.contains('active')) renderVentasHoy();
+}, err => toast('❌ No se pudieron cargar las ventas de hoy (permisos): '+err.message));
+
+// ── TAB VENDER ──
+window.renderCatalogo = () => {
+  const grid = document.getElementById('catalogGrid');
+  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  let entries = Object.entries(catalogo).filter(([k,p])=>p.activo!==false);
+  if(q) entries = entries.filter(([k,p])=>(p.nombre||'').toLowerCase().includes(q)||(p.codigo||'').toLowerCase().includes(q));
+  entries.sort((a,b)=>(a[1].nombre||'').localeCompare(b[1].nombre||''));
+
+  if(entries.length===0){
+    grid.innerHTML = `<div class="empty-state"><div class="icon">📦</div><p>${Object.keys(catalogo).length===0?'Todavía no hay productos cargados.':'No se encontró ningún producto.'}</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = entries.map(([key,p])=>{
+    const stock = p.stock||0;
+    const stockClass = stock<=0?'out':stock<=3?'low':'ok';
+    const stockLabel = stock<=0?'Agotado':stock<=3?`Últimas ${stock}`:'Disponible';
+    return `<div class="prod-card" onclick="openModal('${key}')">
+      <div class="prod-emoji">${emojiFor(p.categoria)}</div>
+      <div class="prod-nombre">${p.nombre||'—'}</div>
+      <div class="prod-meta">${[p.talla,p.color].filter(Boolean).join(' · ')||p.categoria||''}</div>
+      <div class="prod-precio">${fmtCOP(p.precioVenta)}</div>
+      <span class="prod-stock ${stockClass}">${stockLabel}</span>
+    </div>`;
+  }).join('');
+};
+
+// ── MODAL / VENTA ──
+window.openModal = (key) => {
+  const p = catalogo[key];
+  if(!p || (p.stock||0)<=0){ toast('⚠️ Este producto está agotado'); return; }
+  productoActivo = {key, ...p};
+  qty = 1;
+  document.getElementById('mEmoji').textContent = emojiFor(p.categoria);
+  document.getElementById('mNombre').textContent = p.nombre||'—';
+  document.getElementById('mMeta').textContent = [p.talla,p.color].filter(Boolean).join(' · ')||p.categoria||'—';
+  document.getElementById('mPrecio').textContent = fmtCOP(p.precioVenta);
+  updateQtyUI();
+  document.getElementById('modalOverlay').classList.add('open');
+};
+
+window.closeModal = () => {
+  document.getElementById('modalOverlay').classList.remove('open');
+  productoActivo = null;
+};
+
+window.changeQty = (delta) => {
+  if(!productoActivo) return;
+  const max = productoActivo.stock||1;
+  qty = Math.min(max, Math.max(1, qty+delta));
+  updateQtyUI();
+};
+
+function updateQtyUI(){
+  document.getElementById('qtyVal').textContent = qty;
+  document.getElementById('mTotal').textContent = fmtCOP((productoActivo?.precioVenta||0)*qty);
+  document.getElementById('btnConfirm').disabled = false;
+}
+
+window.confirmarVenta = async () => {
+  if(!productoActivo) return;
+  const btn = document.getElementById('btnConfirm');
+  btn.disabled = true; btn.textContent = 'Registrando...';
+  const { key, codigo, nombre, talla, color, precioVenta, stock } = productoActivo;
+  const nuevoStock = Math.max(0, (stock||0) - qty);
+  try{
+    await push(ref(db,'ventasFisicas'), {
+      codigo, nombre, talla:talla||'', color:color||'',
+      precioVenta, cantidad: qty, total: precioVenta*qty,
+      fecha: hoyStr(), ts: Date.now(), origen:'asesora'
+    });
+    await update(ref(db,`catalogoVentas/${key}`), {stock: nuevoStock});
+    toast('✅ Venta registrada. ¡Gracias!');
+    closeModal();
+  }catch(e){
+    toast('❌ Error al registrar: '+e.message);
+    btn.disabled = false; btn.textContent = '✅ Registrar Venta';
+  }
+};
+
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target.id==='modalOverlay') closeModal();
+});
+
+// ── TAB VENTAS DE HOY ──
+window.renderVentasHoy = () => {
+  const hoy = hoyStr();
+  const entries = Object.values(ventasLog).filter(v=>v.fecha===hoy).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const tbody = document.getElementById('hoyBody');
+
+  const totalVendido = entries.reduce((s,v)=>s+(v.total||0),0);
+  const unidades = entries.reduce((s,v)=>s+(v.cantidad||1),0);
+  document.getElementById('hoyTotal').textContent = fmtCOP(totalVendido);
+  document.getElementById('hoyCantidad').textContent = entries.length;
+  document.getElementById('hoyUnidades').textContent = unidades;
+
+  if(entries.length===0){
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray)">Todavía no se ha registrado ninguna venta hoy.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(v=>{
+    const hora = v.ts ? new Date(v.ts).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'}) : '—';
+    return `<tr>
+      <td>${hora}</td>
+      <td style="font-weight:600">${v.nombre||'—'}</td>
+      <td style="color:var(--gray)">${[v.talla,v.color].filter(Boolean).join(' / ')||'—'}</td>
+      <td>${v.cantidad||1}</td>
+      <td>${fmtCOP(v.precioVenta)}</td>
+      <td style="font-weight:600">${fmtCOP(v.total)}</td>
+    </tr>`;
+  }).join('');
+};
+
+// ── TAB INVENTARIO (para cierre / conteo) ──
+window.renderInventarioTab = () => {
+  const q = (document.getElementById('invSearchInput').value||'').toLowerCase().trim();
+  let entries = Object.entries(catalogo).filter(([k,p])=>p.activo!==false);
+  if(q) entries = entries.filter(([k,p])=>(p.nombre||'').toLowerCase().includes(q)||(p.codigo||'').toLowerCase().includes(q));
+  entries.sort((a,b)=>(a[1].nombre||'').localeCompare(b[1].nombre||''));
+  const tbody = document.getElementById('invBody');
+
+  if(entries.length===0){
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--gray)">No hay productos para mostrar.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map(([key,p])=>{
+    const stock = p.stock||0;
+    const cls = stock<=0?'out':stock<=3?'low':'ok';
+    const bg = stock<=0?'var(--danger-bg)':stock<=3?'rgba(184,114,10,0.1)':'var(--success-bg)';
+    const color = stock<=0?'var(--danger)':stock<=3?'var(--warning)':'var(--success)';
+    return `<tr>
+      <td style="font-weight:600">${p.codigo||'—'}</td>
+      <td>${p.nombre||'—'}</td>
+      <td style="color:var(--gray)">${[p.talla,p.color].filter(Boolean).join(' / ')||'—'}</td>
+      <td style="color:var(--gray)">${p.categoria||'—'}</td>
+      <td><span class="badge-stock" style="background:${bg};color:${color}">${stock} unid.</span></td>
+    </tr>`;
+  }).join('');
+};
+</script>
+</body>
+</html>
